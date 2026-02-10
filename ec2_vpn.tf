@@ -7,7 +7,7 @@ resource "aws_eip" "vpn_ec2_eip" {
   domain = "vpc"
 
   tags = {
-    Name = var.instance_name
+    Name        = var.instance_name
     Environment = var.tag_environment
     Ambiente    = var.tag_ambiente
   }

@@ -13,5 +13,5 @@ resource "aws_dynamodb_table" "togglemaster_analytics" {
       type = attribute.value.type
     }
   }
-  
+
 }

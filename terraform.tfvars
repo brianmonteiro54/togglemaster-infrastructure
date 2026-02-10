@@ -8,19 +8,17 @@ tag_ambiente    = "terraform-prod"
 # =============================================================================
 # VPC
 # =============================================================================
-vpc_name             = "ToggleMaster-production"
-vpc_cidr_block       = "10.0.0.0/20"
-public_subnet_cidrs  = ["10.0.0.0/24", "10.0.1.0/24"]
-private_subnet_cidrs = ["10.0.2.0/23", "10.0.4.0/23"]
-availability_zones   = ["us-east-1a", "us-east-1b"]
-public_subnet_map_public_ip = true
-igw_name             = "igw-togglemaster-prod"
-public_subnet_names  = ["public-subnet-1", "public-subnet-2"]
-private_subnet_names = ["private-subnet-1", "private-subnet-2"]
-public_rt_name       = "public-route-table"
-private_rt_names     = ["private-route-table-1", "private-route-table-2"]
-nat_gateway_names    = ["nat-gateway-1", "nat-gateway-2"]
-nat_eip_names        = ["nat-gateway-eip-01", "nat-gateway-eip-02"]
+vpc_name       = "ToggleMaster-production"
+vpc_cidr_block = "10.0.0.0/20"
+# Configuração de Rede Dinâmica
+max_availability_zones = 2
+subnet_newbits         = 4
+
+# Estratégia de NAT Gateway
+enable_nat_gateway = true
+single_nat_gateway = false
+
+enable_kubernetes_tags = true
 
 # =============================================================================
 # EC2 VPN (Pritunl)
@@ -35,8 +33,8 @@ vpn_associate_public_ip = true
 # =============================================================================
 # Security Groups - Names & Descriptions
 # =============================================================================
-pritunl_sg_name         = "Pritunl_VPN-tf"
-pritunl_sg_description  = "Security group for EC2 instance running Pritunl VPN"
+pritunl_sg_name        = "Pritunl_VPN-tf"
+pritunl_sg_description = "Security group for EC2 instance running Pritunl VPN"
 
 eks_workers_sg_name        = "eks-ToggleMaster-prd-workers"
 eks_workers_sg_description = "Security group for EKS worker nodes"
@@ -126,18 +124,18 @@ redis_rule_description = "Allow Redis from EKS workers"
 # =============================================================================
 # Launch Template
 # =============================================================================
-launch_template_name                  = "lt-togglemaster-prod"
-launch_template_instance_type         = "t3.medium"
+launch_template_name                   = "lt-togglemaster-prod"
+launch_template_instance_type          = "t3.medium"
 launch_template_update_default_version = true
-launch_template_device_name           = "/dev/xvdba"
-launch_template_volume_size           = 60
-launch_template_volume_type           = "gp3"
-launch_template_volume_iops           = 3000
-launch_template_delete_on_termination = true
-launch_template_encrypted             = false
-launch_template_ebs_optimized         = true
-launch_template_worker_tag            = "ToggleMaster-prd-workers"
-launch_template_tag_resource_types    = ["instance", "volume"]
+launch_template_device_name            = "/dev/xvdba"
+launch_template_volume_size            = 60
+launch_template_volume_type            = "gp3"
+launch_template_volume_iops            = 3000
+launch_template_delete_on_termination  = true
+launch_template_encrypted              = false
+launch_template_ebs_optimized          = true
+launch_template_worker_tag             = "ToggleMaster-prd-workers"
+launch_template_tag_resource_types     = ["instance", "volume"]
 
 launch_template_metadata = {
   http_endpoint               = "enabled"
@@ -221,9 +219,9 @@ sqs_receive_wait_time  = 20
 # =============================================================================
 # DynamoDB
 # =============================================================================
-dynamodb_table_name  = "ToggleMasterAnalytics"
+dynamodb_table_name   = "ToggleMasterAnalytics"
 dynamodb_billing_mode = "PAY_PER_REQUEST"
-dynamodb_hash_key    = "event_id"
+dynamodb_hash_key     = "event_id"
 
 dynamodb_attributes = [
   {
@@ -244,7 +242,7 @@ pod_identity_associations = {}
 # =============================================================================
 addons = {
   coredns = {
-    addon_version            = "v1.12.4-eksbuild.1"
+    addon_version            = "v1.13.2-eksbuild.1"
     configuration_values     = null
     resolve_conflicts        = "OVERWRITE"
     service_account_role_arn = null
@@ -258,14 +256,14 @@ addons = {
     tags                     = {}
   }
   kube-proxy = {
-    addon_version            = "v1.34.1-eksbuild.2"
+    addon_version            = "v1.34.3-eksbuild.2"
     configuration_values     = null
     resolve_conflicts        = "OVERWRITE"
     service_account_role_arn = null
     tags                     = {}
   }
   vpc-cni = {
-    addon_version            = "v1.21.1-eksbuild.1"
+    addon_version            = "v1.21.1-eksbuild.3"
     configuration_values     = null
     resolve_conflicts        = "OVERWRITE"
     service_account_role_arn = null
