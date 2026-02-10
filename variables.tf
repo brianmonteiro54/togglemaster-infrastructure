@@ -434,12 +434,6 @@ variable "sqs_receive_wait_time" {
   type        = number
 }
 
-variable "sqs_tags" {
-  description = "Tags for the SQS queue"
-  type        = map(string)
-  default     = {}
-}
-
 # =============================================================================
 # DynamoDB Variables
 # =============================================================================
@@ -464,12 +458,6 @@ variable "dynamodb_attributes" {
     name = string
     type = string
   }))
-}
-
-variable "dynamodb_tags" {
-  description = "Tags for the DynamoDB table"
-  type        = map(string)
-  default     = {}
 }
 
 # =============================================================================
