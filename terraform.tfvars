@@ -127,19 +127,20 @@ redis_rule_description = "Allow Redis from EKS workers"
 launch_template_name                   = "lt-togglemaster-prod"
 launch_template_instance_type          = "t3.medium"
 launch_template_update_default_version = true
-launch_template_device_name            = "/dev/xvdba"
+launch_template_device_name            = "/dev/xvda"
 launch_template_volume_size            = 60
 launch_template_volume_type            = "gp3"
 launch_template_volume_iops            = 3000
 launch_template_delete_on_termination  = true
-launch_template_encrypted              = false
+launch_template_encrypted              = true
 launch_template_ebs_optimized          = true
 launch_template_worker_tag             = "ToggleMaster-prd-workers"
 launch_template_tag_resource_types     = ["instance", "volume"]
 
 launch_template_metadata = {
   http_endpoint               = "enabled"
-  http_tokens                 = "optional"
+  http_tokens                 = "required"
+  http_user_agent_restriction = 2
   http_put_response_hop_limit = 7
   instance_metadata_tags      = "enabled"
 }

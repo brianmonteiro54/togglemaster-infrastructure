@@ -1,5 +1,7 @@
 module "vpc" {
-  source = "github.com/brianmonteiro54/terraform-aws-vpc-network//modules/vpc?ref=main"
+  source = "git::https://github.com/brianmonteiro54/terraform-aws-vpc-network.git//modules/vpc?ref=2.0"
+  
+
 
   name        = var.vpc_name
   vpc_cidr    = var.vpc_cidr_block
