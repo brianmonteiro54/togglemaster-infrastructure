@@ -38,8 +38,9 @@ variable "endpoint_private_access" { type = bool }
 variable "endpoint_public_access" { type = bool }
 variable "bootstrap_cluster_creator_admin_permissions" { type = bool }
 variable "enabled_cluster_log_types" { type = list(string) }
-
+# =============================================================================
 # Launch Template
+# =============================================================================
 variable "launch_template_name" { type = string }
 variable "launch_template_instance_type" { type = string }
 variable "launch_template_update_default_version" { type = bool }
@@ -60,8 +61,9 @@ variable "launch_template_metadata" {
     instance_metadata_tags      = string
   })
 }
-
+# =============================================================================
 # Node Groups & Others
+# =============================================================================
 variable "nodegroups" { type = any }
 variable "nodegroup_az_mapping" { type = any }
 variable "nodegroup_max_unavailable" { type = number }
@@ -138,4 +140,27 @@ variable "dynamodb_attributes" {
     name = string
     type = string
   }))
+}
+
+# =============================================================================
+# RDS Variables
+# =============================================================================
+variable "db_name" { type = string }
+variable "db_identifier" { type = string }
+variable "db_engine" { type = string }
+variable "db_engine_version" { type = string }
+variable "db_instance_class" { type = string }
+variable "db_username" { type = string }
+variable "manage_master_user_password" { type = bool }
+variable "db_allocated_storage" { type = number }
+variable "db_max_allocated_storage" { type = number }
+variable "db_storage_type" { type = string }
+variable "db_storage_encrypted" { type = bool }
+variable "db_multi_az" { type = bool }
+variable "db_backup_retention_period" { type = number }
+variable "db_skip_final_snapshot" { type = bool }
+variable "db_deletion_protection" { type = bool }
+variable "db_password_manage" {
+  type    = bool
+  default = true
 }

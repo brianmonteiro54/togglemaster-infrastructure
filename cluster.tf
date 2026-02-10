@@ -2,7 +2,7 @@
 # EKS Cluster Module Call
 # =============================================================================
 module "eks" {
-    source = "git::https://github.com/brianmonteiro54/terraform-aws-eks-platform.git//modules/eks?ref=2.0"
+  source = "git::https://github.com/brianmonteiro54/terraform-aws-eks-platform.git//modules/eks?ref=2.0"
 
 
   # --- Controle de Módulo (Importante para AWS Academy) ---

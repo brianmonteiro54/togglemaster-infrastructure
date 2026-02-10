@@ -218,6 +218,33 @@ sqs_message_retention  = 345600
 sqs_receive_wait_time  = 20
 
 # =============================================================================
+# RDS Database Configuration
+# =============================================================================
+db_name       = "togglemasterdb"
+db_identifier = "togglemaster-production"
+
+# Especificações da Instância (Academy / Free Tier Friendly)
+db_engine         = "postgres"
+db_engine_version = "18.1"
+db_instance_class = "db.t3.micro"
+db_username       = "postgres"
+
+# Gerenciamento de Senha
+manage_master_user_password = true
+
+# Configurações de Storage
+db_allocated_storage     = 20
+db_max_allocated_storage = 100
+db_storage_type          = "gp3"
+db_storage_encrypted     = true
+
+# Alta Disponibilidade e Backup
+db_multi_az                = false
+db_backup_retention_period = 0
+db_skip_final_snapshot     = true
+db_deletion_protection     = false
+
+# =============================================================================
 # DynamoDB
 # =============================================================================
 dynamodb_table_name   = "ToggleMasterAnalytics"

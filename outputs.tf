@@ -45,3 +45,17 @@ output "kubeconfig_command" {
   description = "Comando para configurar o kubectl localmente"
   value       = module.eks.kubeconfig_command
 }
+
+# =============================================================================
+# Outputs - RDS
+# =============================================================================
+
+output "rds_endpoint" {
+  description = "Endpoint do banco de dados RDS"
+  value       = module.rds.db_instance_endpoint
+}
+
+output "rds_get_password_command" {
+  description = "Comando para pegar a senha no Secrets Manager"
+  value       = module.rds.get_password_command
+}

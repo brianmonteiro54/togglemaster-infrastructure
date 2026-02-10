@@ -1,6 +1,6 @@
 module "vpc" {
   source = "git::https://github.com/brianmonteiro54/terraform-aws-vpc-network.git//modules/vpc?ref=2.0"
-  
+
 
 
   name        = var.vpc_name
