@@ -45,6 +45,12 @@ togglemaster_sg_description = "Security group for ToggleMaster - public HTTP and
 auth_service_sg_name        = "auth-service"
 auth_service_sg_description = "Security group for auth-service - PostgreSQL from EKS workers"
 
+flag_service_sg_name        = "flag-service"
+flag_service_sg_description = "Security group for flag_service - PostgreSQL from EKS workers"
+
+targeting_service_sg_name        = "targeting-service"
+targeting_service_sg_description = "Security group for targeting-service - PostgreSQL from EKS workers"
+
 redis_sg_name        = "togglemaster-redis"
 redis_sg_description = "Security group for Redis - access from EKS workers"
 
@@ -114,6 +120,18 @@ auth_service_port             = 5432
 auth_service_protocol         = "tcp"
 auth_service_rule_description = "Allow PostgreSQL from EKS workers"
 
+# =============================================================================
+# Security Groups - Flag Service (PostgreSQL)
+# =============================================================================
+flag_service_port             = 5432
+flag_service_protocol         = "tcp"
+flag_service_rule_description = "Allow PostgreSQL from EKS workers"
+# =============================================================================
+# Security Groups - Targeting Service (PostgreSQL)
+# =============================================================================
+targeting_service_port             = 5432
+targeting_service_protocol         = "tcp"
+targeting_service_rule_description = "Allow PostgreSQL from EKS workers"
 # =============================================================================
 # Security Groups - Redis
 # =============================================================================
@@ -220,9 +238,12 @@ sqs_receive_wait_time  = 20
 # =============================================================================
 # RDS Database Configuration
 # =============================================================================
-db_name       = "togglemasterdb"
-db_identifier = "togglemaster-production"
-
+db_name_auth            = "authdb"
+db_name_flag            = "flagdb"
+db_name_targeting       = "targetingdb"
+db_identifier           = "auth-service"
+db_identifier_flag      = "flag-service"
+db_identifier_targeting = "targeting-service"
 # Especificações da Instância (Academy / Free Tier Friendly)
 db_engine         = "postgres"
 db_engine_version = "18.1"

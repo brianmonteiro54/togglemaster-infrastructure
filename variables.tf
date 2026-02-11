@@ -125,6 +125,16 @@ variable "eks_workers_sg_rules" {
 variable "auth_service_port" { type = number }
 variable "auth_service_protocol" { type = string }
 variable "auth_service_rule_description" { type = string }
+variable "flag_service_sg_name" { type = string }
+variable "flag_service_sg_description" { type = string }
+variable "flag_service_rule_description" { type = string }
+variable "flag_service_port" { type = number }
+variable "flag_service_protocol" { type = string }
+variable "targeting_service_sg_name" { type = string }
+variable "targeting_service_sg_description" { type = string }
+variable "targeting_service_rule_description" { type = string }
+variable "targeting_service_port" { type = number }
+variable "targeting_service_protocol" { type = string }
 variable "redis_port" { type = number }
 variable "redis_protocol" { type = string }
 variable "redis_rule_description" { type = string }
@@ -145,8 +155,12 @@ variable "dynamodb_attributes" {
 # =============================================================================
 # RDS Variables
 # =============================================================================
-variable "db_name" { type = string }
+variable "db_name_auth" { type = string }
+variable "db_name_flag" { type = string }
+variable "db_name_targeting" { type = string }
 variable "db_identifier" { type = string }
+variable "db_identifier_flag" { type = string }
+variable "db_identifier_targeting" { type = string }
 variable "db_engine" { type = string }
 variable "db_engine_version" { type = string }
 variable "db_instance_class" { type = string }
@@ -160,7 +174,3 @@ variable "db_multi_az" { type = bool }
 variable "db_backup_retention_period" { type = number }
 variable "db_skip_final_snapshot" { type = bool }
 variable "db_deletion_protection" { type = bool }
-variable "db_password_manage" {
-  type    = bool
-  default = true
-}

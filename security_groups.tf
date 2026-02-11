@@ -149,6 +149,63 @@ resource "aws_vpc_security_group_egress_rule" "auth_service_egress_all" {
 }
 
 # =============================================================================
+# Security Group: flag-service (PostgreSQL)
+# =============================================================================
+resource "aws_security_group" "flag_service" {
+  name        = var.flag_service_sg_name
+  description = var.flag_service_sg_description
+  vpc_id      = module.vpc.vpc_id
+
+  tags = merge(var.cluster_tags, {
+    Name = var.flag_service_sg_name
+  })
+}
+
+resource "aws_vpc_security_group_ingress_rule" "flag_service_postgres" {
+  description                  = var.flag_service_rule_description
+  security_group_id            = aws_security_group.flag_service.id
+  referenced_security_group_id = aws_security_group.eks_workers.id
+  from_port                    = var.flag_service_port
+  ip_protocol                  = var.flag_service_protocol
+  to_port                      = var.flag_service_port
+}
+
+resource "aws_vpc_security_group_egress_rule" "flag_service_egress_all" {
+  security_group_id = aws_security_group.flag_service.id
+  cidr_ipv4         = var.default_ipv4_cidr
+  ip_protocol       = var.all_protocols
+}
+
+# =============================================================================
+# Security Group: auth-service (PostgreSQL)
+# =============================================================================
+resource "aws_security_group" "targeting_service" {
+  name        = var.targeting_service_sg_name
+  description = var.targeting_service_sg_description
+  vpc_id      = module.vpc.vpc_id
+
+  tags = merge(var.cluster_tags, {
+    Name = var.targeting_service_sg_name
+  })
+}
+
+resource "aws_vpc_security_group_ingress_rule" "targeting_service_postgres" {
+  description                  = var.targeting_service_rule_description
+  security_group_id            = aws_security_group.targeting_service.id
+  referenced_security_group_id = aws_security_group.eks_workers.id
+  from_port                    = var.targeting_service_port
+  ip_protocol                  = var.targeting_service_protocol
+  to_port                      = var.targeting_service_port
+}
+
+resource "aws_vpc_security_group_egress_rule" "targeting_service_egress_all" {
+  security_group_id = aws_security_group.targeting_service.id
+  cidr_ipv4         = var.default_ipv4_cidr
+  ip_protocol       = var.all_protocols
+}
+
+
+# =============================================================================
 # Security Group: Redis
 # =============================================================================
 resource "aws_security_group" "togglemaster_redis" {
