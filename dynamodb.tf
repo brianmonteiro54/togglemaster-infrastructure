@@ -3,7 +3,7 @@
 # =============================================================================
 
 module "dynamodb_analytics" {
-  source = "github.com/brianmonteiro54/terraform-aws-dynamodb//modules/dynamodb?ref=v1.0"
+  source = "github.com/brianmonteiro54/terraform-aws-dynamodb//modules/dynamodb?ref=14cd6820a976950103142b08d50eb668ade2414a"
 
   # --- Required Variables ---
   table_name  = var.dynamodb_table_name
@@ -12,9 +12,9 @@ module "dynamodb_analytics" {
   environment = var.tag_environment
 
   # --- Configuration ---
-  billing_mode                = var.dynamodb_billing_mode
-  table_class                 = "STANDARD"
-  deletion_protection_enabled = false 
+  billing_mode                   = var.dynamodb_billing_mode
+  table_class                    = "STANDARD"
+  deletion_protection_enabled    = false
   point_in_time_recovery_enabled = true
 
   # --- Security & Encryption ---
@@ -23,12 +23,12 @@ module "dynamodb_analytics" {
   kms_key_arn       = null
 
   # --- Monitoring & Alarms ---
-  enable_cloudwatch_alarms = true
+  enable_cloudwatch_alarms    = true
   enable_contributor_insights = true
-  enable_backup_plan = false 
+  enable_backup_plan          = false
 
   tags = {
-    Ambiente  = var.tag_ambiente
+    Ambiente    = var.tag_ambiente
     Environment = var.tag_environment
   }
 }

@@ -28,6 +28,7 @@ resource "aws_vpc_security_group_egress_rule" "pritunl_egress_all" {
   security_group_id = aws_security_group.pritunl_vpn.id
   cidr_ipv4         = var.default_ipv4_cidr
   ip_protocol       = var.all_protocols
+  description       = "Allow all outbound traffic"
 }
 
 # =============================================================================
@@ -75,6 +76,7 @@ resource "aws_vpc_security_group_egress_rule" "eks_workers_egress_all" {
   security_group_id = aws_security_group.eks_workers.id
   cidr_ipv4         = var.default_ipv4_cidr
   ip_protocol       = var.all_protocols
+  description       = "Allow all outbound traffic"
 }
 
 # =============================================================================
@@ -118,6 +120,7 @@ resource "aws_vpc_security_group_egress_rule" "togglemaster_egress_all" {
   security_group_id = aws_security_group.togglemaster_sg.id
   cidr_ipv4         = var.default_ipv4_cidr
   ip_protocol       = var.all_protocols
+  description       = "Allow all outbound traffic"
 }
 
 # =============================================================================
@@ -146,6 +149,7 @@ resource "aws_vpc_security_group_egress_rule" "auth_service_egress_all" {
   security_group_id = aws_security_group.auth_service.id
   cidr_ipv4         = var.default_ipv4_cidr
   ip_protocol       = var.all_protocols
+  description       = "Allow all outbound traffic"
 }
 
 # =============================================================================
@@ -174,6 +178,7 @@ resource "aws_vpc_security_group_egress_rule" "flag_service_egress_all" {
   security_group_id = aws_security_group.flag_service.id
   cidr_ipv4         = var.default_ipv4_cidr
   ip_protocol       = var.all_protocols
+  description       = "Allow all outbound traffic"
 }
 
 # =============================================================================
@@ -202,6 +207,7 @@ resource "aws_vpc_security_group_egress_rule" "targeting_service_egress_all" {
   security_group_id = aws_security_group.targeting_service.id
   cidr_ipv4         = var.default_ipv4_cidr
   ip_protocol       = var.all_protocols
+  description       = "Allow all outbound traffic"
 }
 
 
@@ -231,4 +237,5 @@ resource "aws_vpc_security_group_egress_rule" "togglemaster_redis_egress_all" {
   security_group_id = aws_security_group.togglemaster_redis.id
   cidr_ipv4         = var.default_ipv4_cidr
   ip_protocol       = var.all_protocols
+  description       = "Allow all outbound traffic"
 }

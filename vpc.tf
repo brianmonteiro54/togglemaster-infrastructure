@@ -1,5 +1,5 @@
 module "vpc" {
-  source = "git::https://github.com/brianmonteiro54/terraform-aws-vpc-network.git//modules/vpc?ref=2.0"
+  source = "git::https://github.com/brianmonteiro54/terraform-aws-vpc-network.git//modules/vpc?ref=8d9e89b240e4843d472192cf5e04339f7518832a"
 
 
 
@@ -20,9 +20,9 @@ module "vpc" {
   cluster_name           = var.cluster_name
 
   tags = {
-    Ambiente  = var.tag_ambiente
+    Ambiente    = var.tag_ambiente
     Environment = var.tag_environment
-    ManagedBy = "Terraform"
-    Project   = "ToggleMaster"
+    ManagedBy   = "Terraform"
+    Project     = "ToggleMaster"
   }
 }
