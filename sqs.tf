@@ -3,7 +3,7 @@
 # =============================================================================
 
 module "sqs_events" {
-  source = "github.com/brianmonteiro54/terraform-aws-sqs//modules/sqs?ref=main"
+  source = "github.com/brianmonteiro54/terraform-aws-sqs//modules/sqs?ref=df91d2cb9559492ddfe026ca5510bf68e468bad5"
 
   # --- Identificação ---
   queue_name  = "togglemaster-events"
