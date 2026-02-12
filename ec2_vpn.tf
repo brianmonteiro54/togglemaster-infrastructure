@@ -3,7 +3,7 @@
 # =============================================================================
 
 module "pritunl_vpn" {
-  source = "github.com/brianmonteiro54/terraform-aws-ec2//modules/ec2?ref=5129506ff11225706be2e73e3ca86a3f5f532339"
+  source = "github.com/brianmonteiro54/terraform-aws-ec2//modules/ec2?ref=7697a207824dba770c38caafe88b7fd080d60b03"
 
   # --- Identificação ---
   instance_name = var.instance_name
