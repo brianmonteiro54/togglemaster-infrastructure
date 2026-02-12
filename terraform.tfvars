@@ -29,6 +29,7 @@ instance_type           = "t4g.micro"
 vpn_volume_size         = 8
 vpn_instance_profile    = "LabInstanceProfile"
 vpn_associate_public_ip = true
+create_eip = true
 
 # =============================================================================
 # Security Groups - Names & Descriptions

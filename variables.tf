@@ -257,6 +257,12 @@ variable "instance_type" {
   type        = string
 }
 
+variable "create_eip" {
+  description = "Create and associate Elastic IP"
+  type        = bool
+  default     = false
+}
+
 variable "vpn_volume_size" {
   description = "EBS volume size for the VPN instance."
   type        = number

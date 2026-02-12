@@ -51,7 +51,11 @@ output "sqs_dlq_url" {
 # =============================================================================
 # Outros Recursos Locais
 # =============================================================================
-output "vpn_ec2_public_ip" { value = aws_eip.vpn_ec2_eip.public_ip }
+output "vpn_ec2_public_ip" {
+  description = "Public IP do VPN EC2 (EIP se create_eip=true, senão public_ip da instância)"
+  value       = module.pritunl_vpn.connection_info.public_ip
+}
+
 output "lab_role_arn" { value = data.aws_iam_role.lab_role.arn }
 output "kubeconfig_command" {
   description = "Comando para configurar o kubectl localmente"
