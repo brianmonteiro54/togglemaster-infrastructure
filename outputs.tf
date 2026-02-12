@@ -36,10 +36,22 @@ output "nodegroup_ids" {
 }
 
 # =============================================================================
+# Outputs - SQS
+# =============================================================================
+output "sqs_queue_url" {
+  description = "URL da fila SQS principal"
+  value       = module.sqs_events.queue_url
+}
+
+output "sqs_dlq_url" {
+  description = "URL da Dead Letter Queue"
+  value       = module.sqs_events.dlq_url
+}
+
+# =============================================================================
 # Outros Recursos Locais
 # =============================================================================
 output "vpn_ec2_public_ip" { value = aws_eip.vpn_ec2_eip.public_ip }
-output "sqs_queue_url" { value = aws_sqs_queue.togglemaster_events.id }
 output "lab_role_arn" { value = data.aws_iam_role.lab_role.arn }
 output "kubeconfig_command" {
   description = "Comando para configurar o kubectl localmente"
