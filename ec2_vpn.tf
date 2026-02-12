@@ -8,13 +8,13 @@ module "pritunl_vpn" {
   # --- Identificação ---
   instance_name = var.instance_name
   environment   = var.tag_environment
-  
+
   # --- Configuração da Instância ---
   ami_id        = var.ami_id
   instance_type = var.instance_type
   # O módulo já aceita o nome do profile ou cria um novo
-  iam_instance_profile = var.vpn_instance_profile 
-  
+  iam_instance_profile = var.vpn_instance_profile
+
   # Script de instalação do Docker/Pritunl
   user_data = file("ec2_userdata.sh")
 
@@ -22,14 +22,14 @@ module "pritunl_vpn" {
   vpc_id                      = module.vpc.vpc_id
   subnet_id                   = module.vpc.public_subnet_ids[0]
   associate_public_ip_address = var.vpn_associate_public_ip
-  
+
   # --- Elastic IP (O módulo gerencia a criação e associação) ---
-  create_eip          = var.create_eip
+  create_eip = var.create_eip
 
   # --- Storage ---
   root_volume_size = var.vpn_volume_size
   root_volume_type = "gp3"
-  
+
   enable_ebs_encryption = true
   create_kms_key        = false
 

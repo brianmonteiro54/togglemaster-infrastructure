@@ -278,16 +278,6 @@ variable "vpn_associate_public_ip" {
   type        = bool
 }
 
-variable "pritunl_sg_name" {
-  description = "Name of the Pritunl security group."
-  type        = string
-}
-
-variable "pritunl_sg_description" {
-  description = "Description of the Pritunl security group."
-  type        = string
-}
-
 variable "eks_workers_sg_name" {
   description = "Name of the EKS workers security group."
   type        = string
@@ -305,16 +295,6 @@ variable "togglemaster_sg_name" {
 
 variable "togglemaster_sg_description" {
   description = "Description of the ToggleMaster service security group."
-  type        = string
-}
-
-variable "auth_service_sg_name" {
-  description = "Name of the Auth service security group."
-  type        = string
-}
-
-variable "auth_service_sg_description" {
-  description = "Description of the Auth service security group."
   type        = string
 }
 
@@ -342,18 +322,6 @@ variable "all_protocols" {
   description = "Protocol identifier representing all protocols (e.g., -1)."
   type        = string
 }
-
-
-variable "pritunl_ingress_ports" {
-  description = "List of ingress rules for the Pritunl security group."
-  type = list(object({
-    from_port   = number
-    to_port     = number
-    ip_protocol = string
-    description = string
-  }))
-}
-
 variable "togglemaster_ingress_ports" {
   description = "List of ingress rules for the ToggleMaster service security group."
   type = list(object({
@@ -374,70 +342,7 @@ variable "eks_workers_sg_rules" {
   })
 }
 
-variable "auth_service_port" {
-  description = "Port exposed by the Auth service."
-  type        = number
-}
 
-variable "auth_service_protocol" {
-  description = "Protocol used by the Auth service."
-  type        = string
-}
-
-variable "auth_service_rule_description" {
-  description = "Description for the Auth service security group rule."
-  type        = string
-}
-
-variable "flag_service_sg_name" {
-  description = "Name of the Flag service security group."
-  type        = string
-}
-
-variable "flag_service_sg_description" {
-  description = "Description of the Flag service security group."
-  type        = string
-}
-
-variable "flag_service_rule_description" {
-  description = "Description for the Flag service security group rule."
-  type        = string
-}
-
-variable "flag_service_port" {
-  description = "Port exposed by the Flag service."
-  type        = number
-}
-
-variable "flag_service_protocol" {
-  description = "Protocol used by the Flag service."
-  type        = string
-}
-
-variable "targeting_service_sg_name" {
-  description = "Name of the Targeting service security group."
-  type        = string
-}
-
-variable "targeting_service_sg_description" {
-  description = "Description of the Targeting service security group."
-  type        = string
-}
-
-variable "targeting_service_rule_description" {
-  description = "Description for the Targeting service security group rule."
-  type        = string
-}
-
-variable "targeting_service_port" {
-  description = "Port exposed by the Targeting service."
-  type        = number
-}
-
-variable "targeting_service_protocol" {
-  description = "Protocol used by the Targeting service."
-  type        = string
-}
 
 variable "redis_port" {
   description = "Port used by the Redis service."

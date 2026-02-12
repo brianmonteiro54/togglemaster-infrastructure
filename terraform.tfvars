@@ -29,13 +29,12 @@ instance_type           = "t4g.micro"
 vpn_volume_size         = 8
 vpn_instance_profile    = "LabInstanceProfile"
 vpn_associate_public_ip = true
-create_eip = true
+create_eip              = true
+
 
 # =============================================================================
 # Security Groups - Names & Descriptions
 # =============================================================================
-pritunl_sg_name        = "Pritunl_VPN-tf"
-pritunl_sg_description = "Security group for EC2 instance running Pritunl VPN"
 
 eks_workers_sg_name        = "eks-ToggleMaster-prd-workers"
 eks_workers_sg_description = "Security group for EKS worker nodes"
@@ -43,48 +42,14 @@ eks_workers_sg_description = "Security group for EKS worker nodes"
 togglemaster_sg_name        = "ToggleMaster-sg"
 togglemaster_sg_description = "Security group for ToggleMaster - public HTTP and HTTPS"
 
-auth_service_sg_name        = "auth-service"
-auth_service_sg_description = "Security group for auth-service - PostgreSQL from EKS workers"
-
-flag_service_sg_name        = "flag-service"
-flag_service_sg_description = "Security group for flag_service - PostgreSQL from EKS workers"
-
-targeting_service_sg_name        = "targeting-service"
-targeting_service_sg_description = "Security group for targeting-service - PostgreSQL from EKS workers"
-
 redis_sg_name        = "togglemaster-redis"
 redis_sg_description = "Security group for Redis - access from EKS workers"
-
 # =============================================================================
 # Security Groups - Common Values
 # =============================================================================
 default_ipv4_cidr = "0.0.0.0/0"
 default_ipv6_cidr = "::/0"
 all_protocols     = "-1"
-
-# =============================================================================
-# Security Groups - Pritunl Ingress Rules
-# =============================================================================
-pritunl_ingress_ports = [
-  {
-    from_port   = 80
-    to_port     = 80
-    ip_protocol = "tcp"
-    description = "Allow HTTP"
-  },
-  {
-    from_port   = 443
-    to_port     = 443
-    ip_protocol = "tcp"
-    description = "Allow HTTPS"
-  },
-  {
-    from_port   = 5050
-    to_port     = 5050
-    ip_protocol = "udp"
-    description = "Allow VPN UDP"
-  }
-]
 
 # =============================================================================
 # Security Groups - ToggleMaster Ingress Rules
@@ -114,25 +79,6 @@ eks_workers_sg_rules = {
   from_vpc_cidr     = "All traffic from VPC CIDR"
 }
 
-# =============================================================================
-# Security Groups - Auth Service (PostgreSQL)
-# =============================================================================
-auth_service_port             = 5432
-auth_service_protocol         = "tcp"
-auth_service_rule_description = "Allow PostgreSQL from EKS workers"
-
-# =============================================================================
-# Security Groups - Flag Service (PostgreSQL)
-# =============================================================================
-flag_service_port             = 5432
-flag_service_protocol         = "tcp"
-flag_service_rule_description = "Allow PostgreSQL from EKS workers"
-# =============================================================================
-# Security Groups - Targeting Service (PostgreSQL)
-# =============================================================================
-targeting_service_port             = 5432
-targeting_service_protocol         = "tcp"
-targeting_service_rule_description = "Allow PostgreSQL from EKS workers"
 # =============================================================================
 # Security Groups - Redis
 # =============================================================================

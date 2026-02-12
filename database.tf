@@ -1,6 +1,8 @@
+# =============================================================================
+# auth-service Database
+# =============================================================================
 module "auth_service" {
-  source = "github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds?ref=116cf59aafcadc1e7a6ad79c0cc56c82bfefa716"
-
+  source = "github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds?ref=5c6fa8000f697b76747c2a4c35680a08991b27be"
 
   db_identifier = var.db_identifier
   environment   = var.tag_environment
@@ -13,8 +15,20 @@ module "auth_service" {
 
   manage_master_user_password = var.manage_master_user_password
 
-  subnet_ids             = module.vpc.private_subnet_ids
-  vpc_security_group_ids = [aws_security_group.auth_service.id]
+  subnet_ids = module.vpc.private_subnet_ids
+
+  create_security_group = true
+  vpc_id                = module.vpc.vpc_id
+
+  security_group_ingress_rules = [
+    {
+      from_port                = 5432
+      to_port                  = 5432
+      protocol                 = "tcp"
+      source_security_group_id = aws_security_group.eks_workers.id
+      description              = "Allow PostgreSQL from EKS workers"
+    }
+  ]
 
   allocated_storage     = var.db_allocated_storage
   max_allocated_storage = var.db_max_allocated_storage
@@ -32,10 +46,11 @@ module "auth_service" {
   }
 }
 
-
+# =============================================================================
+# flag-service Database
+# =============================================================================
 module "flag_service" {
-  source = "github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds?ref=116cf59aafcadc1e7a6ad79c0cc56c82bfefa716"
-
+  source = "github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds?ref=5c6fa8000f697b76747c2a4c35680a08991b27be"
 
   db_identifier = var.db_identifier_flag
   environment   = var.tag_environment
@@ -48,8 +63,20 @@ module "flag_service" {
 
   manage_master_user_password = var.manage_master_user_password
 
-  subnet_ids             = module.vpc.private_subnet_ids
-  vpc_security_group_ids = [aws_security_group.flag_service.id]
+  subnet_ids = module.vpc.private_subnet_ids
+
+  create_security_group = true
+  vpc_id                = module.vpc.vpc_id
+
+  security_group_ingress_rules = [
+    {
+      from_port                = 5432
+      to_port                  = 5432
+      protocol                 = "tcp"
+      source_security_group_id = aws_security_group.eks_workers.id
+      description              = "Allow PostgreSQL from EKS workers"
+    }
+  ]
 
   allocated_storage     = var.db_allocated_storage
   max_allocated_storage = var.db_max_allocated_storage
@@ -67,10 +94,11 @@ module "flag_service" {
   }
 }
 
-
+# =============================================================================
+# targeting-service Database
+# =============================================================================
 module "targeting_service" {
-  source = "github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds?ref=116cf59aafcadc1e7a6ad79c0cc56c82bfefa716"
-
+  source = "github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds?ref=5c6fa8000f697b76747c2a4c35680a08991b27be"
 
   db_identifier = var.db_identifier_targeting
   environment   = var.tag_environment
@@ -83,8 +111,20 @@ module "targeting_service" {
 
   manage_master_user_password = var.manage_master_user_password
 
-  subnet_ids             = module.vpc.private_subnet_ids
-  vpc_security_group_ids = [aws_security_group.targeting_service.id]
+  subnet_ids = module.vpc.private_subnet_ids
+
+  create_security_group = true
+  vpc_id                = module.vpc.vpc_id
+
+  security_group_ingress_rules = [
+    {
+      from_port                = 5432
+      to_port                  = 5432
+      protocol                 = "tcp"
+      source_security_group_id = aws_security_group.eks_workers.id
+      description              = "Allow PostgreSQL from EKS workers"
+    }
+  ]
 
   allocated_storage     = var.db_allocated_storage
   max_allocated_storage = var.db_max_allocated_storage

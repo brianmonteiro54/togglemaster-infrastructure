@@ -17,7 +17,7 @@ output "private_subnet_ids" {
 }
 
 # =============================================================================
-# Outputs - EKS Cluster (Repassando do Módulo)
+# Outputs - EKS Cluster
 # =============================================================================
 output "cluster_name" {
   value = module.eks.cluster_name
@@ -87,4 +87,19 @@ output "dynamodb_table_name" {
 output "dynamodb_table_arn" {
   description = "ARN of the DynamoDB table"
   value       = module.dynamodb_analytics.table_arn
+}
+
+output "auth_service_security_group" {
+  description = "Security group criado para auth-service"
+  value       = module.auth_service.security_group_id
+}
+
+output "flag_service_security_group" {
+  description = "Security group criado para flag-service"
+  value       = module.flag_service.security_group_id
+}
+
+output "targeting_service_security_group" {
+  description = "Security group criado para targeting-service"
+  value       = module.targeting_service.security_group_id
 }

@@ -1,4 +1,3 @@
----
 # =============================================================================
 # Pre-commit Configuration for Security and Quality Checks
 # =============================================================================
@@ -9,7 +8,7 @@
 repos:
   # Terraform formatting
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.88.0
+    rev: v1.105.0
     hooks:
       - id: terraform_fmt
         name: Terraform Format
@@ -33,7 +32,7 @@ repos:
 
   # Security scanning with Checkov
   - repo: https://github.com/bridgecrewio/checkov
-    rev: 3.2.0
+    rev: 3.2.501
     hooks:
       - id: checkov
         name: Checkov Security Scan
@@ -46,7 +45,7 @@ repos:
 
   # Security scanning with tfsec
   - repo: https://github.com/aquasecurity/tfsec
-    rev: v1.28.5
+    rev: v1.28.14
     hooks:
       - id: tfsec
         name: TFSec Security Scan
@@ -57,7 +56,7 @@ repos:
 
   # YAML linting
   - repo: https://github.com/adrienverge/yamllint
-    rev: v1.35.1
+    rev: v1.38.0
     hooks:
       - id: yamllint
         name: YAML Lint
@@ -67,7 +66,7 @@ repos:
 
   # General file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
         name: Trim Trailing Whitespace
@@ -93,7 +92,7 @@ repos:
 
   # Markdown linting
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.39.0
+    rev: v0.47.0
     hooks:
       - id: markdownlint
         name: Markdown Lint
