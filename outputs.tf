@@ -63,4 +63,13 @@ output "targeting_service_endpoint" {
   value       = module.targeting_service.db_instance_endpoint
 }
 
+output "dynamodb_table_name" {
+  description = "Name of the DynamoDB table"
+  value       = module.dynamodb_analytics.table_name
+}
+
+output "dynamodb_table_arn" {
+  description = "ARN of the DynamoDB table"
+  value       = module.dynamodb_analytics.table_arn
+}
 

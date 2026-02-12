@@ -21,6 +21,7 @@ module "vpc" {
 
   tags = {
     Ambiente  = var.tag_ambiente
+    Environment = var.tag_environment
     ManagedBy = "Terraform"
     Project   = "ToggleMaster"
   }
