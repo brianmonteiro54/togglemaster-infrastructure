@@ -127,6 +127,24 @@ variable "enabled_cluster_log_types" {
   type        = list(string)
 }
 
+variable "enable_secrets_encryption" {
+  description = "Enable EKS secrets encryption using KMS"
+  type        = bool
+  default     = false
+}
+
+variable "create_kms_key" {
+  description = "Create a new KMS key for EKS secrets encryption. If false and enable_secrets_encryption=true, provide cluster_kms_key_arn."
+  type        = bool
+  default     = true
+}
+
+variable "cluster_kms_key_arn" {
+  description = "Existing KMS key ARN for EKS secrets encryption. Required when enable_secrets_encryption=true and create_kms_key=false."
+  type        = string
+  default     = null
+}
+
 # =============================================================================
 # Launch Template
 # =============================================================================

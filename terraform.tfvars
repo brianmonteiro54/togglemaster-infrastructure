@@ -133,6 +133,10 @@ cluster_tags = {
 authentication_mode                         = "API_AND_CONFIG_MAP"
 bootstrap_cluster_creator_admin_permissions = true
 
+enable_secrets_encryption = true
+create_kms_key            = false
+cluster_kms_key_arn = null
+
 # =============================================================================
 # Node Groups
 # =============================================================================
@@ -152,7 +156,7 @@ nodegroups = {
     capacity_type   = "ON_DEMAND"
     instance_types  = []
     version         = "1.34"
-    release_version = "1.34.2-20260129"
+    release_version = "1.34.3-20260209"
     labels = {
       "cattle.io/cluster-agent" = "true"
     }
@@ -166,7 +170,7 @@ nodegroups = {
     capacity_type   = "ON_DEMAND"
     instance_types  = []
     version         = "1.34"
-    release_version = "1.34.2-20260129"
+    release_version = "1.34.3-20260209"
     labels = {
       "cattle.io/cluster-agent" = "true"
     }

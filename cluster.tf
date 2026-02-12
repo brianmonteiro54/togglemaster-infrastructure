@@ -2,7 +2,7 @@
 # EKS Cluster Module Call
 # =============================================================================
 module "eks" {
-  source = "git::https://github.com/brianmonteiro54/terraform-aws-eks-platform.git//modules/eks?ref=f8a1e616bdfb796591871da9d7bf10ab8dbf79cc"
+  source = "github.com/brianmonteiro54/terraform-aws-eks-platform//modules/eks?ref=main"
 
 
   # --- Controle de Módulo (Importante para AWS Academy) ---
@@ -18,6 +18,9 @@ module "eks" {
   # --- Configurações Gerais ---
   cluster_name    = var.cluster_name
   cluster_version = var.cluster_version
+  enable_secrets_encryption = var.enable_secrets_encryption
+  create_kms_key            = var.create_kms_key
+  cluster_kms_key_arn       = var.cluster_kms_key_arn
   tags = {
     Environment = var.tag_environment
     Ambiente    = var.tag_ambiente
