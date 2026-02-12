@@ -1,37 +1,4 @@
 # =============================================================================
-# Security Group: Pritunl VPN (EC2)
-# =============================================================================
-resource "aws_security_group" "pritunl_vpn" {
-  name        = var.pritunl_sg_name
-  description = var.pritunl_sg_description
-  vpc_id      = module.vpc.vpc_id
-
-  tags = {
-    Environment = var.tag_environment
-    Ambiente    = var.tag_ambiente
-    Name        = var.pritunl_sg_name
-  }
-}
-
-resource "aws_vpc_security_group_ingress_rule" "pritunl_ingress" {
-  count = length(var.pritunl_ingress_ports)
-
-  description       = var.pritunl_ingress_ports[count.index].description
-  security_group_id = aws_security_group.pritunl_vpn.id
-  cidr_ipv4         = var.default_ipv4_cidr
-  from_port         = var.pritunl_ingress_ports[count.index].from_port
-  to_port           = var.pritunl_ingress_ports[count.index].to_port
-  ip_protocol       = var.pritunl_ingress_ports[count.index].ip_protocol
-}
-
-resource "aws_vpc_security_group_egress_rule" "pritunl_egress_all" {
-  security_group_id = aws_security_group.pritunl_vpn.id
-  cidr_ipv4         = var.default_ipv4_cidr
-  ip_protocol       = var.all_protocols
-  description       = "Allow all outbound traffic"
-}
-
-# =============================================================================
 # Security Group: EKS Workers
 # =============================================================================
 resource "aws_security_group" "eks_workers" {
@@ -47,7 +14,7 @@ resource "aws_security_group" "eks_workers" {
 resource "aws_vpc_security_group_ingress_rule" "eks_workers_from_pritunl" {
   description                  = var.eks_workers_sg_rules.from_pritunl
   security_group_id            = aws_security_group.eks_workers.id
-  referenced_security_group_id = aws_security_group.pritunl_vpn.id
+  referenced_security_group_id = module.pritunl_vpn.security_group_id
   ip_protocol                  = var.all_protocols
 }
 
