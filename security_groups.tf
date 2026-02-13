@@ -82,29 +82,3 @@ resource "aws_vpc_security_group_egress_rule" "togglemaster_egress_all" {
   ip_protocol       = var.all_protocols
   description       = "Allow all outbound traffic"
 }
-
-# =============================================================================
-# Security Group: Redis
-# =============================================================================
-resource "aws_security_group" "togglemaster_redis" {
-  name        = var.redis_sg_name
-  description = var.redis_sg_description
-  vpc_id      = module.vpc.vpc_id
-
-}
-
-resource "aws_vpc_security_group_ingress_rule" "togglemaster_redis_ingress" {
-  description                  = var.redis_rule_description
-  security_group_id            = aws_security_group.togglemaster_redis.id
-  referenced_security_group_id = aws_security_group.eks_workers.id
-  from_port                    = var.redis_port
-  ip_protocol                  = var.redis_protocol
-  to_port                      = var.redis_port
-}
-
-resource "aws_vpc_security_group_egress_rule" "togglemaster_redis_egress_all" {
-  security_group_id = aws_security_group.togglemaster_redis.id
-  cidr_ipv4         = var.default_ipv4_cidr
-  ip_protocol       = var.all_protocols
-  description       = "Allow all outbound traffic"
-}

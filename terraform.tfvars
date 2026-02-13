@@ -85,6 +85,8 @@ eks_workers_sg_rules = {
 redis_port             = 6379
 redis_protocol         = "tcp"
 redis_rule_description = "Allow Redis from EKS workers"
+auth_token = "coloque-um-token-forte-com-16-ou-mais"
+
 
 # =============================================================================
 # Launch Template

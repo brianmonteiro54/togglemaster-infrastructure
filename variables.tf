@@ -132,13 +132,6 @@ variable "enable_secrets_encryption" {
   type        = bool
   default     = false
 }
-
-variable "create_kms_key" {
-  description = "Create a new KMS key for EKS secrets encryption. If false and enable_secrets_encryption=true, provide cluster_kms_key_arn."
-  type        = bool
-  default     = true
-}
-
 variable "cluster_kms_key_arn" {
   description = "Existing KMS key ARN for EKS secrets encryption. Required when enable_secrets_encryption=true and create_kms_key=false."
   type        = string
@@ -517,4 +510,49 @@ variable "db_skip_final_snapshot" {
 variable "db_deletion_protection" {
   description = "Enable deletion protection for the RDS instance."
   type        = bool
+}
+
+# --- At-rest (KMS) ---
+variable "enable_encryption" {
+  description = "Enable encryption at rest"
+  type        = bool
+  default     = true
+}
+
+variable "create_kms_key" {
+  description = "Create a customer-managed KMS key (CMK) when encryption is enabled and kms_key_arn is null."
+  type        = bool
+  default     = false
+}
+
+variable "kms_key_arn" {
+  description = "Existing customer-managed KMS Key ARN to use for encryption at rest. If null and create_kms_key=true, a new key will be created."
+  type        = string
+  default     = null
+}
+
+# --- In-transit (TLS) ---
+variable "transit_encryption_enabled" {
+  description = "Enable in-transit encryption (TLS)"
+  type        = bool
+  default     = true
+}
+
+# --- Auth token ---
+variable "auth_token_enabled" {
+  description = "Enable Redis AUTH token"
+  type        = bool
+  default     = true
+}
+
+variable "auth_token" {
+  description = "Redis AUTH token (min 16 chars, max 128 chars)"
+  type        = string
+  default     = null
+  sensitive   = true
+
+  validation {
+    condition     = var.auth_token == null || (length(var.auth_token) >= 16 && length(var.auth_token) <= 128)
+    error_message = "Auth token must be between 16 and 128 characters."
+  }
 }

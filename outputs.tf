@@ -103,3 +103,19 @@ output "targeting_service_security_group" {
   description = "Security group criado para targeting-service"
   value       = module.targeting_service.security_group_id
 }
+
+output "redis_primary_endpoint" {
+  value = module.redis.replication_group_primary_endpoint_address
+}
+
+output "redis_reader_endpoint" {
+  value = module.redis.replication_group_reader_endpoint_address
+}
+
+output "redis_security_group_id" {
+  value = module.redis.security_group_id
+}
+
+output "redis_kms_key_arn" {
+  value = module.redis.kms_key_arn
+}
