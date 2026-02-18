@@ -334,34 +334,27 @@ jobs:
           else
             echo "ENV_NAME=dev" >> $GITHUB_OUTPUT
           fi
+      - name: Generate Trivy Config
+        run: |
+          cat <<EOF > trivy.yaml
+          misconfiguration:
+            terraform:
+              vars:
+                - envs/${{ steps.env.outputs.ENV_NAME }}/terraform.tfvars
+          EOF
 
-      - name: Run Trivy IaC scanner
+
+      - name: Run Trivy IaC scanner (Table)
         id: trivy
-        uses: aquasecurity/trivy-action@0.31.0
+        uses: aquasecurity/trivy-action@0.29.0
         with:
           scan-type: 'config'
           scan-ref: '.'
+          trivy-config: trivy.yaml  # Passando o caminho das variáveis por aqui
           severity: 'MEDIUM,HIGH,CRITICAL'
           exit-code: '1'
           format: 'table'
           output: 'trivy_output.txt'
-          version: 'v0.69.1'
-          args: >
-            --tf-vars envs/${{ steps.env.outputs.ENV_NAME }}/terraform.tfvars
-        continue-on-error: true
-
-
-      - name: Run Trivy IaC scanner
-        id: trivy
-        uses: aquasecurity/trivy-action@0.31.0
-        with:
-          scan-type: 'config'
-          scan-ref: '.'
-          severity: 'MEDIUM,HIGH,CRITICAL'
-          exit-code: '1'
-          format: 'table'
-          output: 'trivy_output.txt'
-          version: 'v0.69.1'
         continue-on-error: true
 
       - name: Trivy SARIF report
