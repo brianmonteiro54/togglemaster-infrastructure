@@ -326,6 +326,14 @@ jobs:
 
       # ── Trivy (substitui tfsec — deprecated desde 2023) ────────────────────
       # Os findings de misconfig ainda são válidos para análise estática.
+      - name: Setup Terraform (for Trivy module resolution)
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform Init (no backend)
+        run: terraform init -backend=false -input=false -no-color
+
       - name: Determine environment
         id: env
         run: |
@@ -334,23 +342,23 @@ jobs:
           else
             echo "ENV_NAME=dev" >> $GITHUB_OUTPUT
           fi
+
       - name: Generate Trivy Config
         run: |
-          cat <<EOF > trivy.yaml
-          misconfiguration:
-            terraform:
-              vars:
-                - envs/${{ steps.env.outputs.ENV_NAME }}/terraform.tfvars
-          EOF
-
+          echo 'misconfiguration:' > trivy.yaml
+          echo '  terraform:' >> trivy.yaml
+          echo '    vars:' >> trivy.yaml
+          echo "      - envs/${{ steps.env.outputs.ENV_NAME }}/terraform.tfvars" >> trivy.yaml
+          echo "--- Generated trivy.yaml ---"
+          cat trivy.yaml
 
       - name: Run Trivy IaC scanner (Table)
         id: trivy
-        uses: aquasecurity/trivy-action@0.29.0
+        uses: aquasecurity/trivy-action@0.31.0
         with:
           scan-type: 'config'
           scan-ref: '.'
-          trivy-config: trivy.yaml  # Passando o caminho das variáveis por aqui
+          trivy-config: trivy.yaml
           severity: 'MEDIUM,HIGH,CRITICAL'
           exit-code: '1'
           format: 'table'
@@ -363,18 +371,11 @@ jobs:
         with:
           scan-type: 'config'
           scan-ref: '.'
+          trivy-config: trivy.yaml
           severity: 'MEDIUM,HIGH,CRITICAL'
           format: 'sarif'
           output: 'trivy-results.sarif'
           skip-setup-trivy: true
-          version: 'v0.69.1'
-        continue-on-error: true
-
-      - name: Upload Trivy SARIF to GitHub Security tab
-        if: always() && hashFiles('trivy-results.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: trivy-results.sarif
         continue-on-error: true
 
       # ── Comentário consolidado no PR ────────────────────────────────────────
