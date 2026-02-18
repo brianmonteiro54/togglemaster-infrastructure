@@ -132,8 +132,8 @@ nodegroups = {
     instance_types  = []
     version         = "1.34"
     release_version = "1.34.3-20260209"
-    labels = {}
-    tags = {}
+    labels          = {}
+    tags            = {}
   }
   "ToggleMaster-prd-private-1b-01" = {
     scaling_min     = 1
@@ -144,8 +144,8 @@ nodegroups = {
     instance_types  = []
     version         = "1.34"
     release_version = "1.34.3-20260209"
-    labels = {}
-    tags = {}
+    labels          = {}
+    tags            = {}
   }
 }
 

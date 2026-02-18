@@ -619,7 +619,7 @@ jobs:
           working-dir:    .
           output-file:    README.md
           output-method:  inject
-          git-push:       false
+          git-push:       true
           recursive:      true
           recursive-path: modules
         continue-on-error: true
