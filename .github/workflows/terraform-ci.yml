@@ -322,6 +322,25 @@ jobs:
             2>&1 | tee checkov_output.txt || true
 
           echo "exitcode=${PIPESTATUS[0]:-0}" >> "$GITHUB_OUTPUT"
+          
+      
+      - name: Debug Variables Check
+        run: |
+          echo "### Debugging Environment Variables ###"
+          echo "Ambiente detectado: ${{ steps.env.outputs.ENV_NAME }}"
+          
+          VAR_FILE="envs/${{ steps.env.outputs.ENV_NAME }}/terraform.tfvars"
+          
+          if [ -f "$VAR_FILE" ]; then
+            echo "Arquivo $VAR_FILE encontrado."
+            echo "----------------------------------------"
+            echo "Valor de endpoint_public_access no tfvars:"
+            grep "cluster_endpoint_public_access" $VAR_FILE || echo "Variável não encontrada no arquivo."
+            echo "----------------------------------------"
+          else
+            echo "ERRO: Arquivo $VAR_FILE NÃO encontrado!"
+            exit 1
+          fi
 
       - name: Upload Checkov report
         if: always()
