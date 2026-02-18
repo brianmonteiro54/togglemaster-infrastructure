@@ -478,7 +478,7 @@ variable "auth_token" {
   nullable    = true
   sensitive   = true
 
-validation {
+  validation {
     condition = try(
       length(var.auth_token) >= 16 &&
       length(var.auth_token) <= 128,
