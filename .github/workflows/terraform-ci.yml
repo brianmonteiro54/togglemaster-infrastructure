@@ -22,15 +22,15 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents:        read
-  pull-requests:   write
+  contents: read
+  pull-requests: write
   security-events: write
 
 env:
   TERRAFORM_VERSION: '1.10.5'
-  TFLINT_VERSION:    'v0.55.1'       # Atualizado — v0.50 está 6+ meses atrás
-  CHECKOV_VERSION:   '3.2.350'       # Pin exato para reprodutibilidade
-  AWS_REGION:        'us-east-1'
+  TFLINT_VERSION: 'v0.55.1'       # Atualizado — v0.50 está 6+ meses atrás
+  CHECKOV_VERSION: '3.2.350'       # Pin exato para reprodutibilidade
+  AWS_REGION: 'us-east-1'
 
 # =============================================================================
 # Job 1: Lint & Format
@@ -104,7 +104,7 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         env:
-          FMT_OUTCOME:    ${{ steps.fmt.outcome }}
+          FMT_OUTCOME: ${{ steps.fmt.outcome }}
           TFLINT_OUTCOME: ${{ steps.tflint.outcome }}
         with:
           script: |
@@ -130,7 +130,7 @@ jobs:
 
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
-              repo:  context.repo.repo,
+              repo: context.repo.repo,
               issue_number: context.issue.number,
             });
 
@@ -141,7 +141,7 @@ jobs:
 
             const params = {
               owner: context.repo.owner,
-              repo:  context.repo.repo,
+              repo: context.repo.repo,
               body,
             };
 
@@ -207,7 +207,7 @@ jobs:
         uses: actions/github-script@v7
         env:
           VALIDATE_OUTCOME: ${{ steps.validate.outcome }}
-          VALIDATE_STDOUT:  ${{ steps.validate.outputs.stdout }}
+          VALIDATE_STDOUT: ${{ steps.validate.outputs.stdout }}
         with:
           script: |
             const fs = require('fs');
@@ -251,7 +251,7 @@ jobs:
 
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
-              repo:  context.repo.repo,
+              repo: context.repo.repo,
               issue_number: context.issue.number,
             });
 
@@ -313,7 +313,7 @@ jobs:
           # Checkov exit code: 0=pass, 1=fail, 2=error
           # Captura resultado mas não falha o step
           echo "exitcode=${PIPESTATUS[0]:-0}" >> "$GITHUB_OUTPUT"
-        
+
 
       - name: Upload Checkov report
         if: always()
@@ -325,9 +325,32 @@ jobs:
           if-no-files-found: warn
 
       # ── Trivy (substitui tfsec — deprecated desde 2023) ────────────────────
-      # NOTA: Trivy avisa "Variable values were not found" porque roda sem
-      # -var-file. Isso é esperado no CI (sem backend/credenciais).
       # Os findings de misconfig ainda são válidos para análise estática.
+      - name: Determine environment
+        id: env
+        run: |
+          if [[ "${{ github.base_ref }}" == "main" || "${{ github.ref_name }}" == "main" ]]; then
+            echo "ENV_NAME=prod" >> $GITHUB_OUTPUT
+          else
+            echo "ENV_NAME=dev" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run Trivy IaC scanner
+        id: trivy
+        uses: aquasecurity/trivy-action@0.31.0
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+          severity: 'MEDIUM,HIGH,CRITICAL'
+          exit-code: '1'
+          format: 'table'
+          output: 'trivy_output.txt'
+          version: 'v0.69.1'
+          args: >
+            --tf-vars envs/${{ steps.env.outputs.ENV_NAME }}/terraform.tfvars
+        continue-on-error: true
+
+
       - name: Run Trivy IaC scanner
         id: trivy
         uses: aquasecurity/trivy-action@0.31.0
@@ -367,7 +390,7 @@ jobs:
         uses: actions/github-script@v7
         env:
           CHECKOV_OUTCOME: ${{ steps.checkov.outcome }}
-          TRIVY_OUTCOME:   ${{ steps.trivy.outcome }}
+          TRIVY_OUTCOME: ${{ steps.trivy.outcome }}
         with:
           script: |
             const fs = require('fs');
@@ -422,7 +445,7 @@ jobs:
 
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
-              repo:  context.repo.repo,
+              repo: context.repo.repo,
               issue_number: context.issue.number,
             });
 
@@ -477,10 +500,10 @@ jobs:
         if: env.SHOULD_RUN == 'true'
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region:            ${{ env.AWS_REGION }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Setup Terraform
         if: env.SHOULD_RUN == 'true'
@@ -537,7 +560,7 @@ jobs:
         uses: actions/github-script@v7
         env:
           HAS_CHANGES: ${{ steps.plan.outputs.has_changes }}
-          ENV_NAME:    ${{ matrix.env_name }}
+          ENV_NAME: ${{ matrix.env_name }}
         with:
           script: |
             const fs = require('fs');
@@ -581,7 +604,7 @@ jobs:
 
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
-              repo:  context.repo.repo,
+              repo: context.repo.repo,
               issue_number: context.issue.number,
             });
 
@@ -616,11 +639,11 @@ jobs:
       - name: Check terraform-docs
         uses: terraform-docs/gh-actions@v1.3.0
         with:
-          working-dir:    .
-          output-file:    README.md
-          output-method:  inject
-          git-push:       true
-          recursive:      true
+          working-dir: .
+          output-file: README.md
+          output-method: inject
+          git-push: true
+          recursive: true
           recursive-path: modules
         continue-on-error: true
 

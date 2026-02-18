@@ -39,7 +39,7 @@ permissions:
 
 env:
   TERRAFORM_VERSION: '1.10.5'
-  AWS_REGION:        'us-east-1'
+  AWS_REGION: 'us-east-1'
 
 # =============================================================================
 # Job 1: Validate & Confirm
@@ -50,10 +50,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
-      env_name:     ${{ steps.validate.outputs.env_name }}
-      tfvars_path:  ${{ steps.validate.outputs.tfvars_path }}
+      env_name: ${{ steps.validate.outputs.env_name }}
+      tfvars_path: ${{ steps.validate.outputs.tfvars_path }}
       backend_path: ${{ steps.validate.outputs.backend_path }}
-      has_targets:  ${{ steps.validate.outputs.has_targets }}
+      has_targets: ${{ steps.validate.outputs.has_targets }}
       targets_flag: ${{ steps.validate.outputs.targets_flag }}
 
     steps:
@@ -124,7 +124,7 @@ jobs:
     timeout-minutes: 30
     needs: validate
     outputs:
-      has_changes:  ${{ steps.plan.outputs.has_changes }}
+      has_changes: ${{ steps.plan.outputs.has_changes }}
       plan_summary: ${{ steps.stats.outputs.summary }}
 
     steps:
@@ -134,16 +134,16 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region:            ${{ env.AWS_REGION }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Verify AWS identity
         run: |
           IDENTITY=$(aws sts get-caller-identity --output json)
           echo "AWS Identity: $(echo "$IDENTITY" | jq -r '.Arn')"
-          echo "Account:      $(echo "$IDENTITY" | jq -r '.Account')"
+          echo "Account: $(echo "$IDENTITY" | jq -r '.Account')"
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -288,16 +288,16 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region:            ${{ env.AWS_REGION }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Verify AWS identity
         run: |
           IDENTITY=$(aws sts get-caller-identity --output json)
           echo "AWS Identity: $(echo "$IDENTITY" | jq -r '.Arn')"
-          echo "Account:      $(echo "$IDENTITY" | jq -r '.Account')"
+          echo "Account: $(echo "$IDENTITY" | jq -r '.Account')"
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -455,10 +455,10 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region:            ${{ env.AWS_REGION }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
