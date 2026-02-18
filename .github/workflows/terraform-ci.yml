@@ -324,23 +324,28 @@ jobs:
           echo "exitcode=${PIPESTATUS[0]:-0}" >> "$GITHUB_OUTPUT"
           
       
-      - name: Debug Full tfvars Content
+      - name: 🔍 Debug - Inspeção Profunda de Variáveis
+        id: debug_vars
         run: |
-          echo "### INFO: Lendo conteúdo completo de envs/${{ steps.env.outputs.ENV_NAME }}/terraform.tfvars ###"
-          VAR_FILE="envs/${{ steps.env.outputs.ENV_NAME }}/terraform.tfvars"
+          echo "======= CHECKPOINT DE AMBIENTE ======="
+          echo "Ambiente: ${{ steps.env.outputs.ENV_NAME }}"
+          PATH_TFVARS="envs/${{ steps.env.outputs.ENV_NAME }}/terraform.tfvars"
           
-          if [ -f "$VAR_FILE" ]; then
-            echo "--- INÍCIO DO ARQUIVO ---"
-            cat -A "$VAR_FILE"  # O -A mostra caracteres ocultos como ^M (Windows) ou Tabs
-            echo -e "\n--- FIM DO ARQUIVO ---"
-            
-            echo "--- Teste de busca flexível ---"
-            grep -i "public_access" "$VAR_FILE" || echo "Mesmo com busca flexível, nada foi encontrado."
+          if [ -f "$PATH_TFVARS" ]; then
+            echo "✅ Arquivo encontrado em: $PATH_TFVARS"
+            echo "---------------------------------------"
+            echo "CONTEÚDO BRUTO (cat):"
+            cat "$PATH_TFVARS"
+            echo -e "\n---------------------------------------"
+            echo "BUSCA POR PALAVRA-CHAVE (grep):"
+            # O grep -i ignora maiúsculas/minúsculas
+            # O tr -d remove possíveis caracteres ocultos de Windows (\r)
+            cat "$PATH_TFVARS" | tr -d '\r' | grep -i "public_access" || echo "❌ Variável não encontrada via grep"
+            echo "---------------------------------------"
           else
-            echo "❌ Arquivo não encontrado em: $VAR_FILE"
-            exit 1
-          fi else
-            echo "ERRO: Arquivo $VAR_FILE NÃO encontrado!"
+            echo "❌ ERRO CRÍTICO: Arquivo não existe em $PATH_TFVARS"
+            echo "Arquivos disponíveis no diretório envs/:"
+            ls -R envs/
             exit 1
           fi
 
