@@ -302,6 +302,9 @@ jobs:
             echo "ENV_NAME=dev" >> $GITHUB_OUTPUT
           fi
 
+      - name: Install Checkov
+        run: pip install checkov==${{ env.CHECKOV_VERSION }} --quiet
+
       - name: Run Checkov
         id: checkov
         run: |
