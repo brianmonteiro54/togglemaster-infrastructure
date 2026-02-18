@@ -50,7 +50,7 @@ module "redis" {
   # ===== IN-TRANSIT (TLS) + AUTH =====
   transit_encryption_enabled = true
   auth_token_enabled         = false
-  auth_token                 = null
+  auth_token                 = var.auth_token
 
   tags = {
     Project  = "ToggleMaster"
