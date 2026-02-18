@@ -93,7 +93,7 @@ cluster_version   = "1.34"
 service_ipv4_cidr = "10.43.0.0/16"
 ip_family         = "ipv4"
 
-enabled_cluster_log_types = ["api", "audit"]
+enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 support_type              = "EXTENDED"
 deletion_protection       = true
 

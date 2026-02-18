@@ -281,6 +281,7 @@ jobs:
         uses: actions/checkout@v4
 
       # ── Checkov ─────────────────────────────────────────────────────────────
+     
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -292,8 +293,14 @@ jobs:
           path: ~/.cache/pip
           key: pip-checkov-${{ env.CHECKOV_VERSION }}
 
-      - name: Install Checkov
-        run: pip install checkov==${{ env.CHECKOV_VERSION }} --quiet
+      - name: Determine environment
+        id: env
+        run: |
+          if [[ "${{ github.base_ref }}" == "main" || "${{ github.ref_name }}" == "main" ]]; then
+            echo "ENV_NAME=prod" >> $GITHUB_OUTPUT
+          else
+            echo "ENV_NAME=dev" >> $GITHUB_OUTPUT
+          fi
 
       - name: Run Checkov
         id: checkov
@@ -302,6 +309,7 @@ jobs:
             --directory . \
             --framework terraform \
             --download-external-modules true \
+            --var-file envs/${{ steps.env.outputs.ENV_NAME }}/terraform.tfvars \
             --output cli \
             --output json \
             --output-file-path console,checkov-report.json \
@@ -310,10 +318,7 @@ jobs:
             --skip-check CKV_AWS_119,CKV_AWS_28 \
             2>&1 | tee checkov_output.txt || true
 
-          # Checkov exit code: 0=pass, 1=fail, 2=error
-          # Captura resultado mas não falha o step
           echo "exitcode=${PIPESTATUS[0]:-0}" >> "$GITHUB_OUTPUT"
-
 
       - name: Upload Checkov report
         if: always()
@@ -334,14 +339,7 @@ jobs:
       - name: Terraform Init (no backend)
         run: terraform init -backend=false -input=false -no-color
 
-      - name: Determine environment
-        id: env
-        run: |
-          if [[ "${{ github.base_ref }}" == "main" || "${{ github.ref_name }}" == "main" ]]; then
-            echo "ENV_NAME=prod" >> $GITHUB_OUTPUT
-          else
-            echo "ENV_NAME=dev" >> $GITHUB_OUTPUT
-          fi
+
 
       - name: Generate Trivy Config
         run: |
