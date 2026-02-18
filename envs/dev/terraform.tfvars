@@ -95,7 +95,7 @@ ip_family         = "ipv4"
 
 enabled_cluster_log_types = ["api", "audit"]
 support_type              = "EXTENDED"
-deletion_protection       = true
+deletion_protection       = false
 
 endpoint_private_access = true
 endpoint_public_access  = false
