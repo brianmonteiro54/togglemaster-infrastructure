@@ -1,5 +1,5 @@
 module "redis" {
-  source = "github.com/brianmonteiro54/terraform-aws-redis-elasticache//modules/redis?ref=51514a9ebe7364296e959e901f4e449bd3f091ce"
+  source = "github.com/brianmonteiro54/terraform-aws-redis-elasticache//modules/redis?ref=d8438ce626269b08e31529e7f302683acf10dedb"
 
   replication_group_id = "togglemaster-redis"
   environment          = var.tag_environment

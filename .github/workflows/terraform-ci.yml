@@ -1,10 +1,8 @@
-name: Terraform CI Pipeline
+name: Terraform CI
 
-'on':
+on:
   pull_request:
-    branches:
-      - main
-      - develop
+    branches: [main, developer]
     paths:
       - '**.tf'
       - '**.tfvars'
@@ -12,35 +10,39 @@ name: Terraform CI Pipeline
       - '.github/workflows/terraform-ci.yml'
       - '.tflint.hcl'
   push:
-    branches:
-      - main
-      - develop
+    branches: [main, developer]
     paths:
       - '**.tf'
       - '**.tfvars'
       - '**.hcl'
   workflow_dispatch:
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
-  contents: read
-  pull-requests: write
+  contents:        read
+  pull-requests:   write
   security-events: write
 
 env:
-  TERRAFORM_VERSION: '1.9.8'
-  TFLINT_VERSION: 'v0.50.3'
-  TFSEC_VERSION: 'v1.28.5'
-  CHECKOV_VERSION: '3.2.0'
+  TERRAFORM_VERSION: '1.10.5'
+  TFLINT_VERSION:    'v0.55.1'       # Atualizado — v0.50 está 6+ meses atrás
+  CHECKOV_VERSION:   '3.2.350'       # Pin exato para reprodutibilidade
+  AWS_REGION:        'us-east-1'
 
+# =============================================================================
+# Job 1: Lint & Format
+# =============================================================================
 jobs:
-  # =============================================================================
-  # Job 1: Validation and Formatting
-  # =============================================================================
-  validate:
-    name: Terraform Validate & Format
+  lint-format:
+    name: Lint & Format
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Terraform
@@ -48,377 +50,639 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - name: Terraform Format Check
-        id: fmt
-        run: terraform fmt -check -recursive -diff
-        continue-on-error: true
-
-      - name: Terraform Init
-        id: init
-        run: |
-          # Find directories with .tf files, excluding modules
-          find . -type f -name "*.tf" -not -path "*/modules/*" \
-            -exec dirname {} \; | sort -u | while read dir; do
-            if [ -f "$dir/versions.tf" ] || \
-               [ -f "$dir/main.tf" ] || \
-               [ -f "$dir/provider.tf" ]; then
-              echo "Initializing $dir"
-              cd "$GITHUB_WORKSPACE/$dir"
-              terraform init -backend=false || echo "⚠️ Init failed for $dir"
-            fi
-          done
-        continue-on-error: false
-
-      - name: Terraform Validate
-        id: validate
-        run: |
-          # Find directories with .tf files, excluding modules
-          find . -type f -name "*.tf" -not -path "*/modules/*" \
-            -exec dirname {} \; | sort -u | while read dir; do
-            if [ -f "$dir/versions.tf" ] || \
-               [ -f "$dir/main.tf" ] || \
-               [ -f "$dir/provider.tf" ]; then
-              echo "Validating $dir"
-              cd "$GITHUB_WORKSPACE/$dir"
-              terraform validate || echo "⚠️ Validation failed for $dir"
-            fi
-          done
-
-      - name: Comment PR - Validation
-        if: >-
-          github.event_name == 'pull_request' &&
-          (steps.fmt.outcome == 'failure' ||
-          steps.validate.outcome == 'failure')
-        uses: actions/github-script@v7
+      # Cache de providers — compartilhado com o job validate
+      - name: Cache Terraform providers
+        uses: actions/cache@v4
         with:
-          script: |
-            const output = `#### Terraform Format and Style 🖌\
-            \`${{ steps.fmt.outcome }}\`
-            #### Terraform Initialization ⚙️\
-            \`${{ steps.init.outcome }}\`
-            #### Terraform Validation 🤖\
-            \`${{ steps.validate.outcome }}\`
+          path: |
+            ~/.terraform.d/plugin-cache
+            **/.terraform/providers
+          key: tf-providers-${{ runner.os }}-${{ hashFiles('**/.terraform.lock.hcl') }}
+          restore-keys: tf-providers-${{ runner.os }}-
 
-            *Pushed by: @${{ github.actor }}, \
-            Action: \`${{ github.event_name }}\`*`;
+      - name: Configure Terraform plugin cache
+        run: |
+          mkdir -p ~/.terraform.d/plugin-cache
+          echo 'plugin_cache_dir = "$HOME/.terraform.d/plugin-cache"' > ~/.terraformrc
 
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
+      # Init sem backend — baixa módulos externos para que TFLint consiga resolvê-los
+      - name: Terraform Init (no backend)
+        run: terraform init -backend=false -input=false -no-color
 
-  # =============================================================================
-  # Job 2: TFLint - Terraform Linting
-  # =============================================================================
-  tflint:
-    name: TFLint Analysis
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Cache TFLint Plugin Directory
+      - name: Cache TFLint plugins
         uses: actions/cache@v4
         with:
           path: ~/.tflint.d/plugins
-          key: ${{ runner.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
+          key: tflint-${{ runner.os }}-${{ hashFiles('.tflint.hcl') }}
+          restore-keys: tflint-${{ runner.os }}-
 
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v4
         with:
           tflint_version: ${{ env.TFLINT_VERSION }}
 
-      - name: Show TFLint Version
-        run: tflint --version
-
       - name: Init TFLint
-        run: |
-          tflint --init \
-            --config="${GITHUB_WORKSPACE}/.tflint.hcl"
+        run: tflint --init --config="${GITHUB_WORKSPACE}/.tflint.hcl"
 
-      - name: Run TFLint
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check -recursive -diff
+        continue-on-error: true
+
+      - name: TFLint
         id: tflint
         run: |
           tflint \
             --config="${GITHUB_WORKSPACE}/.tflint.hcl" \
             --format=compact \
             --recursive \
-            --force
+            --force 2>&1 | tee tflint_output.txt
+          echo "exitcode=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
         continue-on-error: true
 
-      - name: Comment PR - TFLint
-        if: >-
-          github.event_name == 'pull_request' &&
-          steps.tflint.outcome == 'failure'
+      - name: Comment PR — Lint & Format
+        if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
+        env:
+          FMT_OUTCOME:    ${{ steps.fmt.outcome }}
+          TFLINT_OUTCOME: ${{ steps.tflint.outcome }}
         with:
           script: |
-            const output = `#### TFLint 📝\`${{ steps.tflint.outcome }}\`
+            const fmtStatus    = process.env.FMT_OUTCOME;
+            const tflintStatus = process.env.TFLINT_OUTCOME;
+            const fmtIcon      = fmtStatus    === 'success' ? '✅' : '❌';
+            const tflintIcon   = tflintStatus === 'success' ? '✅' : '⚠️';
 
-            <details><summary>Show TFLint Results</summary>
+            const body = [
+              '## 🔍 Terraform Lint & Format',
+              '',
+              '| Check | Status |',
+              '|-------|--------|',
+              `| Terraform Format | ${fmtIcon} \`${fmtStatus}\` |`,
+              `| TFLint | ${tflintIcon} \`${tflintStatus}\` |`,
+              '',
+              fmtStatus !== 'success'
+                ? '> 💡 Execute `terraform fmt -recursive` localmente e faça commit.'
+                : '',
+              '',
+              `_Commit: \`${{ github.sha }}\`_`,
+            ].filter(Boolean).join('\n');
 
-            \`\`\`
-            ${{ steps.tflint.outputs.stdout }}
-            \`\`\`
-
-            </details>
-
-            *Pushed by: @${{ github.actor }}*`;
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
+            const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
+              repo:  context.repo.repo,
+              issue_number: context.issue.number,
+            });
 
-  # =============================================================================
-  # Job 3: Security Scanning with Checkov
-  # =============================================================================
-  checkov:
-    name: Checkov Security Scan
+            const marker = '## 🔍 Terraform Lint & Format';
+            const existing = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes(marker)
+            );
+
+            const params = {
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              body,
+            };
+
+            if (existing) {
+              await github.rest.issues.updateComment({ ...params, comment_id: existing.id });
+            } else {
+              await github.rest.issues.createComment({ ...params, issue_number: context.issue.number });
+            }
+
+      - name: Evaluate results
+        run: |
+          if [[ "${{ steps.fmt.outcome }}" == "failure" ]]; then
+            echo "::error::terraform fmt falhou. Execute 'terraform fmt -recursive' e faça commit."
+            exit 1
+          fi
+          echo "✅ Lint & Format OK"
+
+# =============================================================================
+# Job 2: Validate (Sintaxe)
+# =============================================================================
+  validate:
+    name: Terraform Validate
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Cache Terraform providers
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.terraform.d/plugin-cache
+            **/.terraform/providers
+          key: tf-providers-${{ runner.os }}-${{ hashFiles('**/.terraform.lock.hcl') }}
+          restore-keys: tf-providers-${{ runner.os }}-
+
+      - name: Configure Terraform plugin cache
+        run: |
+          mkdir -p ~/.terraform.d/plugin-cache
+          echo 'plugin_cache_dir = "$HOME/.terraform.d/plugin-cache"' > ~/.terraformrc
+
+      # Init sem backend — valida sintaxe sem precisar de credenciais AWS
+      - name: Terraform Init (no backend)
+        run: terraform init -backend=false -input=false -no-color
+
+      # NOTA: validate sem -var-file pode falhar com módulos que usam default=null
+      # em condições de validação (Terraform não faz short-circuit). Resultado é
+      # tratado como warning, não bloqueante. Validação real acontece no plan (CD).
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color 2>&1 | tee validate_output.txt
+        continue-on-error: true
+
+      - name: Comment PR — Validate
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          VALIDATE_OUTCOME: ${{ steps.validate.outcome }}
+          VALIDATE_STDOUT:  ${{ steps.validate.outputs.stdout }}
+        with:
+          script: |
+            const fs = require('fs');
+            const status = process.env.VALIDATE_OUTCOME;
+            const icon   = status === 'success' ? '✅' : '⚠️';
+
+            let output = '';
+            try {
+              output = fs.readFileSync('validate_output.txt', 'utf8').trim();
+            } catch (e) {
+              output = process.env.VALIDATE_STDOUT || 'Sem output disponível';
+            }
+
+            // Trunca output longo para não estourar limite do GitHub API (65536 chars)
+            const MAX_LEN = 3000;
+            if (output.length > MAX_LEN) {
+              output = output.substring(0, MAX_LEN) + '\n\n... (truncado)';
+            }
+
+            const isModuleError = status === 'failure' &&
+              (output.includes('modules/') && (output.includes('null') || output.includes('default')));
+
+            const note = isModuleError
+              ? '\n> ⚠️ Possível falha por `default = null` em módulo — não bloqueante. Validação completa ocorre no plan.'
+              : '';
+
+            const body = [
+              '## ⚙️ Terraform Validate',
+              '',
+              `**Status:** ${icon} \`${status}\`${note}`,
+              '',
+              '<details><summary>Ver output</summary>',
+              '',
+              '```',
+              output,
+              '```',
+              '</details>',
+              '',
+              `_Commit: \`${{ github.sha }}\`_`,
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const marker = '## ⚙️ Terraform Validate';
+            const existing = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes(marker)
+            );
+
+            const params = { owner: context.repo.owner, repo: context.repo.repo, body };
+
+            if (existing) {
+              await github.rest.issues.updateComment({ ...params, comment_id: existing.id });
+            } else {
+              await github.rest.issues.createComment({ ...params, issue_number: context.issue.number });
+            }
+
+# =============================================================================
+# Job 3: Security Scanning (Checkov + Trivy)
+# =============================================================================
+  security:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── Checkov ─────────────────────────────────────────────────────────────
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-checkov-${{ env.CHECKOV_VERSION }}
 
       - name: Install Checkov
-        run: pip install checkov==${{ env.CHECKOV_VERSION }}
+        run: pip install checkov==${{ env.CHECKOV_VERSION }} --quiet
 
       - name: Run Checkov
         id: checkov
         run: |
-          checkov --directory . \
-                  --framework terraform \
-                  --output cli \
-                  --output json \
-                  --output-file-path \
-                    console,checkov-report.json \
-                  --quiet \
-                  --skip-check CKV_AWS_119,CKV_AWS_28
-        continue-on-error: true
+          checkov \
+            --directory . \
+            --framework terraform \
+            --download-external-modules true \
+            --output cli \
+            --output json \
+            --output-file-path console,checkov-report.json \
+            --quiet \
+            --compact \
+            --skip-check CKV_AWS_119,CKV_AWS_28 \
+            2>&1 | tee checkov_output.txt || true
 
-      - name: Upload Checkov Report
+          # Checkov exit code: 0=pass, 1=fail, 2=error
+          # Captura resultado mas não falha o step
+          echo "exitcode=${PIPESTATUS[0]:-0}" >> "$GITHUB_OUTPUT"
+        
+
+      - name: Upload Checkov report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: checkov-report
+          name: checkov-report-${{ github.sha }}
           path: checkov-report.json
           retention-days: 30
+          if-no-files-found: warn
 
-      - name: Comment PR - Checkov
-        if: >-
-          github.event_name == 'pull_request' &&
-          steps.checkov.outcome == 'failure'
+      # ── Trivy (substitui tfsec — deprecated desde 2023) ────────────────────
+      # NOTA: Trivy avisa "Variable values were not found" porque roda sem
+      # -var-file. Isso é esperado no CI (sem backend/credenciais).
+      # Os findings de misconfig ainda são válidos para análise estática.
+      - name: Run Trivy IaC scanner
+        id: trivy
+        uses: aquasecurity/trivy-action@0.31.0
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+          severity: 'MEDIUM,HIGH,CRITICAL'
+          exit-code: '1'
+          format: 'table'
+          output: 'trivy_output.txt'
+          version: 'v0.69.1'
+        continue-on-error: true
+
+      - name: Trivy SARIF report
+        if: always()
+        uses: aquasecurity/trivy-action@0.31.0
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+          severity: 'MEDIUM,HIGH,CRITICAL'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          skip-setup-trivy: true
+          version: 'v0.69.1'
+        continue-on-error: true
+
+      - name: Upload Trivy SARIF to GitHub Security tab
+        if: always() && hashFiles('trivy-results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-results.sarif
+        continue-on-error: true
+
+      # ── Comentário consolidado no PR ────────────────────────────────────────
+      - name: Comment PR — Security
+        if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
+        env:
+          CHECKOV_OUTCOME: ${{ steps.checkov.outcome }}
+          TRIVY_OUTCOME:   ${{ steps.trivy.outcome }}
         with:
           script: |
             const fs = require('fs');
-            let summary = 'Failed to load Checkov summary';
 
+            const checkovStatus = process.env.CHECKOV_OUTCOME;
+            const trivyStatus   = process.env.TRIVY_OUTCOME;
+
+            // Parse seguro do relatório Checkov
+            let checkovSummary = '_Relatório não disponível_';
             try {
-              const report = JSON.parse(
-                fs.readFileSync('checkov-report.json', 'utf8')
-              );
-              const summary_data = report.summary || {};
-              summary = `
-              - Passed: ${summary_data.passed || 0}
-              - Failed: ${summary_data.failed || 0}
-              - Skipped: ${summary_data.skipped || 0}
-              `;
+              const raw = fs.readFileSync('checkov-report.json', 'utf8');
+              const report = JSON.parse(raw);
+              const results = Array.isArray(report) ? report : [report];
+              const s = results.reduce((acc, r) => {
+                const summary = r?.summary || {};
+                acc.passed  += summary.passed  || 0;
+                acc.failed  += summary.failed  || 0;
+                acc.skipped += summary.skipped || 0;
+                return acc;
+              }, { passed: 0, failed: 0, skipped: 0 });
+              checkovSummary = `✅ ${s.passed} passed · ❌ ${s.failed} failed · ⏭️ ${s.skipped} skipped`;
             } catch (e) {
-              console.error(
-                'Error reading Checkov report:', e
-              );
+              console.log(`Checkov report parse error: ${e.message}`);
             }
 
-            const output = `#### Checkov Security Scan 🔒\
-            \`${{ steps.checkov.outcome }}\`
+            // Trivy summary
+            let trivySummary = '_Relatório não disponível_';
+            try {
+              const trivyOutput = fs.readFileSync('trivy_output.txt', 'utf8');
+              const lines = trivyOutput.split('\n');
+              const totalLine = lines.find(l => l.includes('Total:'));
+              trivySummary = totalLine ? totalLine.trim() : (trivyStatus === 'success' ? 'Nenhum finding' : 'Ver output');
+            } catch (e) {
+              trivySummary = trivyStatus === 'success' ? 'Nenhum finding' : 'Ver aba Security';
+            }
 
-            <details><summary>Show Summary</summary>
+            const icon = (s) => s === 'success' ? '✅' : '⚠️';
 
-            ${summary}
+            const body = [
+              '## 🔒 Security Scanning',
+              '',
+              '| Scanner | Status | Detalhes |',
+              '|---------|--------|----------|',
+              `| Checkov | ${icon(checkovStatus)} \`${checkovStatus}\` | ${checkovSummary} |`,
+              `| Trivy   | ${icon(trivyStatus)} \`${trivyStatus}\`   | ${trivySummary} |`,
+              '',
+              '> Findings de segurança são **warnings** — não bloqueiam merge, mas exigem revisão.',
+              '> Resultados detalhados disponíveis na aba **Security** do repositório.',
+              '',
+              `_Commit: \`${{ github.sha }}\`_`,
+            ].join('\n');
 
-            </details>
-
-            *Download full report from workflow artifacts*
-            *Pushed by: @${{ github.actor }}*`;
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
+            const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
+              repo:  context.repo.repo,
+              issue_number: context.issue.number,
+            });
 
-  # =============================================================================
-  # Job 4: Security Scanning with tfsec
-  # =============================================================================
-  tfsec:
-    name: tfsec Security Scan
+            const marker = '## 🔒 Security Scanning';
+            const existing = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes(marker)
+            );
+
+            const params = { owner: context.repo.owner, repo: context.repo.repo, body };
+
+            if (existing) {
+              await github.rest.issues.updateComment({ ...params, comment_id: existing.id });
+            } else {
+              await github.rest.issues.createComment({ ...params, issue_number: context.issue.number });
+            }
+
+# =============================================================================
+# Job 4: Plan Preview (apenas PRs — mostra impacto antes do merge)
+# =============================================================================
+  plan-preview:
+    name: Plan Preview (${{ matrix.env_name }})
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name == 'pull_request'
+    needs: [lint-format, validate]
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - branch: main
+            env_name: prod
+          - branch: developer
+            env_name: dev
+
+    # Só roda plan do ambiente correspondente à branch-alvo do PR
+    # Ex: PR para main → plan de prod; PR para developer → plan de dev
+    # A expressão usa contains() porque github.base_ref pode ter prefixo refs/
+    env:
+      SHOULD_RUN: ${{ contains(github.base_ref, matrix.branch) }}
+
     steps:
-      - name: Checkout Code
+      - name: Skip if not target env
+        if: env.SHOULD_RUN != 'true'
+        run: echo "⏭️ Skipping plan for ${{ matrix.env_name }} — PR target is ${{ github.base_ref }}"
+
+      - name: Checkout
+        if: env.SHOULD_RUN == 'true'
         uses: actions/checkout@v4
 
-      - name: Run tfsec
-        id: tfsec
-        uses: aquasecurity/tfsec-action@v1.0.3
+      - name: Configure AWS Credentials
+        if: env.SHOULD_RUN == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          version: ${{ env.TFSEC_VERSION }}
-          soft_fail: true
-          format: sarif
-          additional_args: >-
-            --exclude-downloaded-modules
-            --minimum-severity=MEDIUM
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region:            ${{ env.AWS_REGION }}
 
-      - name: Upload SARIF file
-        if: always()
-        uses: github/codeql-action/upload-sarif@v4
+      - name: Setup Terraform
+        if: env.SHOULD_RUN == 'true'
+        uses: hashicorp/setup-terraform@v3
         with:
-          sarif_file: results.sarif
-        continue-on-error: true
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - name: Run tfsec (CLI output)
+      - name: Cache Terraform providers
+        if: env.SHOULD_RUN == 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.terraform.d/plugin-cache
+            **/.terraform/providers
+          key: tf-providers-${{ runner.os }}-${{ hashFiles('**/.terraform.lock.hcl') }}
+          restore-keys: tf-providers-${{ runner.os }}-
+
+      - name: Configure Terraform plugin cache
+        if: env.SHOULD_RUN == 'true'
         run: |
-          docker run --rm \
-            -v "$(pwd):/src" \
-            aquasec/tfsec:${{ env.TFSEC_VERSION }} \
-            /src \
-            --exclude-downloaded-modules \
-            --minimum-severity=MEDIUM \
-            --format=default
-        continue-on-error: true
+          mkdir -p ~/.terraform.d/plugin-cache
+          echo 'plugin_cache_dir = "$HOME/.terraform.d/plugin-cache"' > ~/.terraformrc
 
-  # =============================================================================
-  # Job 5: YAML Linting
-  # =============================================================================
-  yamllint:
-    name: YAML Lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install yamllint
-        run: pip install yamllint
-
-      - name: Run yamllint
+      - name: Terraform Init
+        if: env.SHOULD_RUN == 'true'
         run: |
-          yamllint --format parsable --strict . || true
+          terraform init \
+            -backend-config="envs/${{ matrix.env_name }}/backend.hcl" \
+            -reconfigure \
+            -input=false \
+            -no-color
 
-  # =============================================================================
-  # Job 6: Documentation Check
-  # =============================================================================
-  terraform-docs:
-    name: Terraform Documentation
+      - name: Terraform Plan
+        if: env.SHOULD_RUN == 'true'
+        id: plan
+        run: |
+          set +e
+          terraform plan \
+            -var-file="envs/${{ matrix.env_name }}/terraform.tfvars" \
+            -detailed-exitcode \
+            -input=false \
+            -no-color 2>&1 | tee plan_output.txt
+
+          EXIT_CODE=${PIPESTATUS[0]}
+
+          case $EXIT_CODE in
+            0) echo "has_changes=false" >> "$GITHUB_OUTPUT" ;;
+            1) echo "has_changes=error" >> "$GITHUB_OUTPUT"; exit 1 ;;
+            2) echo "has_changes=true"  >> "$GITHUB_OUTPUT" ;;
+          esac
+
+      - name: Comment PR — Plan Preview
+        if: env.SHOULD_RUN == 'true' && always()
+        uses: actions/github-script@v7
+        env:
+          HAS_CHANGES: ${{ steps.plan.outputs.has_changes }}
+          ENV_NAME:    ${{ matrix.env_name }}
+        with:
+          script: |
+            const fs = require('fs');
+            const envName = process.env.ENV_NAME;
+            const hasChanges = process.env.HAS_CHANGES;
+
+            let planOutput = '_Plan output não disponível_';
+            try {
+              planOutput = fs.readFileSync('plan_output.txt', 'utf8').trim();
+            } catch (e) {}
+
+            // Trunca para respeitar limite de 65536 chars da API
+            const MAX = 50000;
+            if (planOutput.length > MAX) {
+              planOutput = planOutput.substring(0, MAX) + '\n\n... (truncado — ver logs do CI para output completo)';
+            }
+
+            let statusLine;
+            if (hasChanges === 'true') {
+              statusLine = '🔄 **Mudanças detectadas** — review o plan abaixo antes de aprovar.';
+            } else if (hasChanges === 'error') {
+              statusLine = '❌ **Plan falhou** — corrija os erros antes do merge.';
+            } else {
+              statusLine = '✅ **Sem mudanças** — infraestrutura já está no estado desejado.';
+            }
+
+            const body = [
+              `## 📋 Plan Preview — \`${envName}\``,
+              '',
+              statusLine,
+              '',
+              '<details><summary>Ver plan completo</summary>',
+              '',
+              '```hcl',
+              planOutput,
+              '```',
+              '</details>',
+              '',
+              `_Commit: \`${{ github.sha }}\`_`,
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const marker = `## 📋 Plan Preview — \`${envName}\``;
+            const existing = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes(marker)
+            );
+
+            const params = { owner: context.repo.owner, repo: context.repo.repo, body };
+
+            if (existing) {
+              await github.rest.issues.updateComment({ ...params, comment_id: existing.id });
+            } else {
+              await github.rest.issues.createComment({ ...params, issue_number: context.issue.number });
+            }
+
+# =============================================================================
+# Job 5: Terraform Docs
+# =============================================================================
+  docs:
+    name: Terraform Docs
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event_name == 'pull_request'
+
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
-      - name: Render terraform docs
-        uses: terraform-docs/gh-actions@v1.1.0
+      - name: Check terraform-docs
+        uses: terraform-docs/gh-actions@v1.3.0
         with:
-          working-dir: .
-          output-file: README.md
-          output-method: inject
-          git-push: false
-          recursive: true
+          working-dir:    .
+          output-file:    README.md
+          output-method:  inject
+          git-push:       false
+          recursive:      true
           recursive-path: modules
+        continue-on-error: true
 
-  # =============================================================================
-  # Job 7: Cost Estimation with Infracost
-  # =============================================================================
-  infracost:
-    name: Cost Estimation
+# =============================================================================
+# Job 6: CI Gate — portão bloqueante final
+# =============================================================================
+  ci-gate:
+    name: CI Gate
     runs-on: ubuntu-latest
-    # CRÍTICO: Só roda em Pull Requests
-    if: github.event_name == 'pull_request'
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Infracost
-        uses: infracost/actions/setup@v3
-        with:
-          api-key: ${{ secrets.INFRACOST_API_KEY }}
-
-      - name: Generate Infracost cost estimate baseline
-        run: |
-          infracost breakdown --path=. \
-            --format=json \
-            --out-file=/tmp/infracost-base.json
-
-      - name: Generate Infracost diff
-        run: |
-          infracost diff --path=. \
-            --format=json \
-            --compare-to=/tmp/infracost-base.json \
-            --out-file=/tmp/infracost.json
-
-      - name: Post Infracost comment
-        if: github.event.pull_request.number != ''
-        run: |
-          infracost comment github \
-            --path=/tmp/infracost.json \
-            --repo=$GITHUB_REPOSITORY \
-            --github-token=${{ github.token }} \
-            --pull-request=${{ github.event.pull_request.number }} \
-            --behavior=update
-
-  # =============================================================================
-  # Job 8: Summary and Gate
-  # =============================================================================
-  pipeline-summary:
-    name: Pipeline Summary
-    runs-on: ubuntu-latest
-    needs: [validate, tflint, checkov, tfsec, yamllint, infracost]
+    timeout-minutes: 5
+    needs: [lint-format, validate, security]
     if: always()
-    steps:
-      - name: Check Job Results
-        run: |
-          echo "Validation: ${{ needs.validate.result }}"
-          echo "TFLint: ${{ needs.tflint.result }}"
-          echo "Checkov: ${{ needs.checkov.result }}"
-          echo "tfsec: ${{ needs.tfsec.result }}"
-          echo "YAML Lint: ${{ needs.yamllint.result }}"
-          echo "Infracost: ${{ needs.infracost.result }}"
 
-      - name: Evaluate Pipeline
+    steps:
+      - name: Evaluate gate
         run: |
-          # Critical failures (block merge)
+          echo "══════════════════════════════════════════════════"
+          echo "   RESULTADOS DO CI"
+          echo "══════════════════════════════════════════════════"
+          echo "  Lint & Format : ${{ needs.lint-format.result }}"
+          echo "  Validate      : ${{ needs.validate.result }} (aviso)"
+          echo "  Security      : ${{ needs.security.result }} (aviso)"
+          echo "══════════════════════════════════════════════════"
+
+          BLOCKING_FAILED=false
+
+          if [[ "${{ needs.lint-format.result }}" == "failure" ]]; then
+            echo "::error::BLOQUEANTE: Lint & Format falhou"
+            BLOCKING_FAILED=true
+          fi
+
+          # Validate: warning apenas (limitação de módulos com default=null)
           if [[ "${{ needs.validate.result }}" == "failure" ]]; then
-            echo "❌ Terraform validation failed"
+            echo "::warning::Validate reportou problemas — pode ser limitação de módulos com null"
+          fi
+
+          # Security: warning — não bloqueia merge mas exige revisão
+          if [[ "${{ needs.security.result }}" == "failure" ]]; then
+            echo "::warning::Security scan encontrou findings — revisão obrigatória"
+          fi
+
+          if [[ "$BLOCKING_FAILED" == "true" ]]; then
+            echo "::error::CI falhou. Corrija os erros acima."
             exit 1
           fi
 
-          # Warnings (don't block merge)
-          if [[ "${{ needs.tflint.result }}" == "failure" ]]; then
-            echo "⚠️  TFLint found issues"
-          fi
+          echo "✅ CI passou — código aprovado para deploy."
 
-          if [[ "${{ needs.checkov.result }}" == "failure" ]] || \
-             [[ "${{ needs.tfsec.result }}" == "failure" ]]; then
-            echo "⚠️  Security scans found issues - review required"
-          fi
+      - name: Summary
+        if: always()
+        run: |
+          STATUS="${{ job.status }}"
+          ICON=$([[ "$STATUS" == "success" ]] && echo "✅ Passou" || echo "❌ Falhou")
 
-          if [[ "${{ needs.infracost.result }}" == "failure" ]]; then
-            echo "⚠️  Infracost analysis failed"
-          fi
+          cat >> "$GITHUB_STEP_SUMMARY" <<EOF
+          ### CI Pipeline — ${ICON}
 
-          echo "✅ Pipeline completed - Review results above"
+          | Job | Resultado | Tipo |
+          |-----|-----------|------|
+          | Lint & Format | \`${{ needs.lint-format.result }}\` | 🔒 Bloqueante |
+          | Validate      | \`${{ needs.validate.result }}\`    | ⚠️ Warning |
+          | Security      | \`${{ needs.security.result }}\`    | ⚠️ Warning |
+
+          _Branch: \`${{ github.ref_name }}\` · Commit: \`${{ github.sha }}\`_
+          EOF
