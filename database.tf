@@ -1,7 +1,7 @@
 # =============================================================================
 # auth-service Database
 # =============================================================================
-module "auth_service" {
+module "auth_service_rds" {
   source = "github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds?ref=5c6fa8000f697b76747c2a4c35680a08991b27be"
 
   db_identifier = var.db_identifier
@@ -49,7 +49,7 @@ module "auth_service" {
 # =============================================================================
 # flag-service Database
 # =============================================================================
-module "flag_service" {
+module "flag_service_rds" {
   source = "github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds?ref=5c6fa8000f697b76747c2a4c35680a08991b27be"
 
   db_identifier = var.db_identifier_flag
@@ -97,7 +97,7 @@ module "flag_service" {
 # =============================================================================
 # targeting-service Database
 # =============================================================================
-module "targeting_service" {
+module "targeting_service_rds" {
   source = "github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds?ref=5c6fa8000f697b76747c2a4c35680a08991b27be"
 
   db_identifier = var.db_identifier_targeting

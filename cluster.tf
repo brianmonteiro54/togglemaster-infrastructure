@@ -16,8 +16,8 @@ module "eks" {
   node_role_arn    = data.aws_iam_role.lab_role.arn
 
   # --- Configurações Gerais ---
-  cluster_name    = var.cluster_name
-  cluster_version = var.cluster_version
+  cluster_name              = var.cluster_name
+  cluster_version           = var.cluster_version
   enable_secrets_encryption = var.enable_secrets_encryption
   create_kms_key            = var.create_kms_key
   cluster_kms_key_arn       = var.cluster_kms_key_arn

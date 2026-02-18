@@ -35,12 +35,12 @@ module "redis" {
     }
   ]
 
-cluster_mode_enabled = false
-num_node_groups          = 1
-replicas_per_node_group  = 2
+  cluster_mode_enabled    = false
+  num_node_groups         = 1
+  replicas_per_node_group = 2
 
-multi_az_enabled = false
-enable_multi_region = false
+  multi_az_enabled    = false
+  enable_multi_region = false
 
   # ===== KMS / ENCRYPTION AT REST  =====
   enable_encryption = true
@@ -49,8 +49,8 @@ enable_multi_region = false
 
   # ===== IN-TRANSIT (TLS) + AUTH =====
   transit_encryption_enabled = true
-auth_token_enabled = false
-auth_token         = null
+  auth_token_enabled         = false
+  auth_token                 = null
 
   tags = {
     Project  = "ToggleMaster"

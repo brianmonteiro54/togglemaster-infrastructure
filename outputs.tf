@@ -20,19 +20,23 @@ output "private_subnet_ids" {
 # Outputs - EKS Cluster
 # =============================================================================
 output "cluster_name" {
-  value = module.eks.cluster_name
+  description = "Name of the EKS cluster."
+  value       = module.eks.cluster_name
 }
 
 output "cluster_endpoint" {
-  value = module.eks.cluster_endpoint
+  description = "Endpoint URL of the EKS cluster API server."
+  value       = module.eks.cluster_endpoint
 }
 
 output "cluster_arn" {
-  value = module.eks.cluster_arn
+  description = "ARN of the EKS cluster."
+  value       = module.eks.cluster_arn
 }
 
 output "nodegroup_ids" {
-  value = module.eks.node_group_ids
+  description = "List of IDs of the EKS managed node groups."
+  value       = module.eks.node_group_ids
 }
 
 # =============================================================================
@@ -56,7 +60,10 @@ output "vpn_ec2_public_ip" {
   value       = module.pritunl_vpn.connection_info.public_ip
 }
 
-output "lab_role_arn" { value = data.aws_iam_role.lab_role.arn }
+output "lab_role_arn" {
+  description = "ARN of the IAM role used for the lab environment."
+  value       = data.aws_iam_role.lab_role.arn
+}
 output "kubeconfig_command" {
   description = "Comando para configurar o kubectl localmente"
   value       = module.eks.kubeconfig_command
@@ -68,15 +75,15 @@ output "kubeconfig_command" {
 
 output "auth_service_endpoint" {
   description = "Endpoint do banco de dados RDS"
-  value       = module.auth_service.db_instance_endpoint
+  value       = module.auth_service_rds.db_instance_endpoint
 }
 output "flag_service_endpoint" {
   description = "Endpoint do banco de dados RDS"
-  value       = module.flag_service.db_instance_endpoint
+  value       = module.flag_service_rds.db_instance_endpoint
 }
 output "targeting_service_endpoint" {
   description = "Endpoint do banco de dados RDS"
-  value       = module.targeting_service.db_instance_endpoint
+  value       = module.targeting_service_rds.db_instance_endpoint
 }
 
 output "dynamodb_table_name" {
@@ -91,31 +98,35 @@ output "dynamodb_table_arn" {
 
 output "auth_service_security_group" {
   description = "Security group criado para auth-service"
-  value       = module.auth_service.security_group_id
+  value       = module.auth_service_rds.security_group_id
 }
 
 output "flag_service_security_group" {
   description = "Security group criado para flag-service"
-  value       = module.flag_service.security_group_id
+  value       = module.flag_service_rds.security_group_id
 }
 
 output "targeting_service_security_group" {
   description = "Security group criado para targeting-service"
-  value       = module.targeting_service.security_group_id
+  value       = module.targeting_service_rds.security_group_id
 }
 
 output "redis_primary_endpoint" {
-  value = module.redis.replication_group_primary_endpoint_address
+  description = "Primary endpoint address of the Redis replication group."
+  value       = module.redis.replication_group_primary_endpoint_address
 }
 
 output "redis_reader_endpoint" {
-  value = module.redis.replication_group_reader_endpoint_address
+  description = "Reader endpoint address of the Redis replication group."
+  value       = module.redis.replication_group_reader_endpoint_address
 }
 
 output "redis_security_group_id" {
-  value = module.redis.security_group_id
+  description = "Security group ID associated with the Redis cluster."
+  value       = module.redis.security_group_id
 }
 
 output "redis_kms_key_arn" {
-  value = module.redis.kms_key_arn
+  description = "KMS key ARN used for Redis at-rest encryption."
+  value       = module.redis.kms_key_arn
 }

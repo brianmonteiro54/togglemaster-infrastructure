@@ -299,33 +299,8 @@ variable "eks_workers_sg_description" {
   type        = string
 }
 
-variable "togglemaster_sg_name" {
-  description = "Name of the ToggleMaster service security group."
-  type        = string
-}
-
-variable "togglemaster_sg_description" {
-  description = "Description of the ToggleMaster service security group."
-  type        = string
-}
-
-variable "redis_sg_name" {
-  description = "Name of the Redis security group."
-  type        = string
-}
-
-variable "redis_sg_description" {
-  description = "Description of the Redis security group."
-  type        = string
-}
-
 variable "default_ipv4_cidr" {
   description = "Default IPv4 CIDR allowed in security group rules."
-  type        = string
-}
-
-variable "default_ipv6_cidr" {
-  description = "Default IPv6 CIDR allowed in security group rules."
   type        = string
 }
 
@@ -333,16 +308,6 @@ variable "all_protocols" {
   description = "Protocol identifier representing all protocols (e.g., -1)."
   type        = string
 }
-variable "togglemaster_ingress_ports" {
-  description = "List of ingress rules for the ToggleMaster service security group."
-  type = list(object({
-    from_port   = number
-    to_port     = number
-    ip_protocol = string
-    description = string
-  }))
-}
-
 variable "eks_workers_sg_rules" {
   description = "Security group rule sources allowed to access EKS worker nodes."
   type = object({
@@ -351,23 +316,6 @@ variable "eks_workers_sg_rules" {
     from_togglemaster = string
     from_vpc_cidr     = string
   })
-}
-
-
-
-variable "redis_port" {
-  description = "Port used by the Redis service."
-  type        = number
-}
-
-variable "redis_protocol" {
-  description = "Protocol used by the Redis service."
-  type        = string
-}
-
-variable "redis_rule_description" {
-  description = "Description for the Redis security group rule."
-  type        = string
 }
 
 variable "sqs_queue_name" {
@@ -513,11 +461,6 @@ variable "db_deletion_protection" {
 }
 
 # --- At-rest (KMS) ---
-variable "enable_encryption" {
-  description = "Enable encryption at rest"
-  type        = bool
-  default     = true
-}
 
 variable "create_kms_key" {
   description = "Create a customer-managed KMS key (CMK) when encryption is enabled and kms_key_arn is null."
@@ -525,26 +468,9 @@ variable "create_kms_key" {
   default     = false
 }
 
-variable "kms_key_arn" {
-  description = "Existing customer-managed KMS Key ARN to use for encryption at rest. If null and create_kms_key=true, a new key will be created."
-  type        = string
-  default     = null
-}
-
 # --- In-transit (TLS) ---
-variable "transit_encryption_enabled" {
-  description = "Enable in-transit encryption (TLS)"
-  type        = bool
-  default     = true
-}
 
 # --- Auth token ---
-variable "auth_token_enabled" {
-  description = "Enable Redis AUTH token"
-  type        = bool
-  default     = true
-}
-
 variable "auth_token" {
   description = "Redis AUTH token (min 16 chars, max 128 chars)"
   type        = string

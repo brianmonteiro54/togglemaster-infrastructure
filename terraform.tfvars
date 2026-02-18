@@ -39,35 +39,11 @@ create_eip              = true
 eks_workers_sg_name        = "eks-ToggleMaster-prd-workers"
 eks_workers_sg_description = "Security group for EKS worker nodes"
 
-togglemaster_sg_name        = "ToggleMaster-sg"
-togglemaster_sg_description = "Security group for ToggleMaster - public HTTP and HTTPS"
-
-redis_sg_name        = "togglemaster-redis"
-redis_sg_description = "Security group for Redis - access from EKS workers"
 # =============================================================================
 # Security Groups - Common Values
 # =============================================================================
 default_ipv4_cidr = "0.0.0.0/0"
-default_ipv6_cidr = "::/0"
 all_protocols     = "-1"
-
-# =============================================================================
-# Security Groups - ToggleMaster Ingress Rules
-# =============================================================================
-togglemaster_ingress_ports = [
-  {
-    from_port   = 80
-    to_port     = 80
-    ip_protocol = "tcp"
-    description = "Allow HTTP"
-  },
-  {
-    from_port   = 443
-    to_port     = 443
-    ip_protocol = "tcp"
-    description = "Allow HTTPS"
-  }
-]
 
 # =============================================================================
 # Security Groups - EKS Workers Ingress Descriptions
@@ -82,9 +58,6 @@ eks_workers_sg_rules = {
 # =============================================================================
 # Security Groups - Redis
 # =============================================================================
-redis_port             = 6379
-redis_protocol         = "tcp"
-redis_rule_description = "Allow Redis from EKS workers"
 auth_token = "coloque-um-token-forte-com-16-ou-mais"
 
 
@@ -137,7 +110,7 @@ bootstrap_cluster_creator_admin_permissions = true
 
 enable_secrets_encryption = true
 create_kms_key            = false
-cluster_kms_key_arn = null
+cluster_kms_key_arn       = null
 
 # =============================================================================
 # Node Groups
