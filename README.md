@@ -279,6 +279,169 @@ O `terraform.tfstate` **nunca** fica local. Estado armazenado em S3 com criptogr
 A seção abaixo é **automaticamente populada** pelo [terraform-docs](https://terraform-docs.io/) via GitHub Actions (`terraform-docs/gh-actions@v1.3.0`) a cada Pull Request. O job injeta automaticamente a documentação de **Requirements**, **Providers**, **Modules**, **Resources**, **Inputs** e **Outputs** entre os marcadores abaixo.
 
 <!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.31 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.32.1 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_analytics_service_ecr"></a> [analytics\_service\_ecr](#module\_analytics\_service\_ecr) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | 446bd6c6d9edefa5fa844c32b1dffc2efec14bfe |
+| <a name="module_auth_service_ecr"></a> [auth\_service\_ecr](#module\_auth\_service\_ecr) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | 446bd6c6d9edefa5fa844c32b1dffc2efec14bfe |
+| <a name="module_auth_service_rds"></a> [auth\_service\_rds](#module\_auth\_service\_rds) | github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds | 5c6fa8000f697b76747c2a4c35680a08991b27be |
+| <a name="module_dynamodb_analytics"></a> [dynamodb\_analytics](#module\_dynamodb\_analytics) | github.com/brianmonteiro54/terraform-aws-dynamodb//modules/dynamodb | 14cd6820a976950103142b08d50eb668ade2414a |
+| <a name="module_eks"></a> [eks](#module\_eks) | github.com/brianmonteiro54/terraform-aws-eks-platform//modules/eks | 15a9fc3c01f7f4428abdcbf57adbc178e38c95dc |
+| <a name="module_evaluation_service_ecr"></a> [evaluation\_service\_ecr](#module\_evaluation\_service\_ecr) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | 446bd6c6d9edefa5fa844c32b1dffc2efec14bfe |
+| <a name="module_flag_service_ecr"></a> [flag\_service\_ecr](#module\_flag\_service\_ecr) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | 446bd6c6d9edefa5fa844c32b1dffc2efec14bfe |
+| <a name="module_flag_service_rds"></a> [flag\_service\_rds](#module\_flag\_service\_rds) | github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds | 5c6fa8000f697b76747c2a4c35680a08991b27be |
+| <a name="module_pritunl_vpn"></a> [pritunl\_vpn](#module\_pritunl\_vpn) | github.com/brianmonteiro54/terraform-aws-ec2//modules/ec2 | 7697a207824dba770c38caafe88b7fd080d60b03 |
+| <a name="module_redis"></a> [redis](#module\_redis) | github.com/brianmonteiro54/terraform-aws-redis-elasticache//modules/redis | d8438ce626269b08e31529e7f302683acf10dedb |
+| <a name="module_sqs_events"></a> [sqs\_events](#module\_sqs\_events) | github.com/brianmonteiro54/terraform-aws-sqs//modules/sqs | fba066708138b481bcdad0ef73176cd9c294d185 |
+| <a name="module_targeting_service_ecr"></a> [targeting\_service\_ecr](#module\_targeting\_service\_ecr) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | 446bd6c6d9edefa5fa844c32b1dffc2efec14bfe |
+| <a name="module_targeting_service_rds"></a> [targeting\_service\_rds](#module\_targeting\_service\_rds) | github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds | 5c6fa8000f697b76747c2a4c35680a08991b27be |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | git::https://github.com/brianmonteiro54/terraform-aws-vpc-network.git//modules/vpc | 8d9e89b240e4843d472192cf5e04339f7518832a |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [aws_security_group.eks_workers](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_vpc_security_group_egress_rule.eks_workers_egress_all](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule) | resource |
+| [aws_vpc_security_group_ingress_rule.eks_workers_from_pritunl](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
+| [aws_vpc_security_group_ingress_rule.eks_workers_from_self](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
+| [aws_vpc_security_group_ingress_rule.eks_workers_from_vpc_cidr](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
+| [aws_iam_role.lab_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_role) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_access_entries"></a> [access\_entries](#input\_access\_entries) | IAM access entries for the EKS cluster. | `any` | n/a | yes |
+| <a name="input_addons"></a> [addons](#input\_addons) | Map of EKS add-ons and their configurations. | `any` | n/a | yes |
+| <a name="input_all_protocols"></a> [all\_protocols](#input\_all\_protocols) | Protocol identifier representing all protocols (e.g., -1). | `string` | n/a | yes |
+| <a name="input_ami_id"></a> [ami\_id](#input\_ami\_id) | AMI ID used for the EC2 instance. | `string` | n/a | yes |
+| <a name="input_auth_token"></a> [auth\_token](#input\_auth\_token) | Redis AUTH token (min 16 chars, max 128 chars) | `string` | `null` | no |
+| <a name="input_authentication_mode"></a> [authentication\_mode](#input\_authentication\_mode) | Authentication mode for the EKS cluster. | `string` | n/a | yes |
+| <a name="input_bootstrap_cluster_creator_admin_permissions"></a> [bootstrap\_cluster\_creator\_admin\_permissions](#input\_bootstrap\_cluster\_creator\_admin\_permissions) | Grant cluster creator admin permissions during bootstrap. | `bool` | n/a | yes |
+| <a name="input_cluster_kms_key_arn"></a> [cluster\_kms\_key\_arn](#input\_cluster\_kms\_key\_arn) | Existing KMS key ARN for EKS secrets encryption. Required when enable\_secrets\_encryption=true and create\_kms\_key=false. | `string` | `null` | no |
+| <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Name of the EKS cluster. | `string` | n/a | yes |
+| <a name="input_cluster_tags"></a> [cluster\_tags](#input\_cluster\_tags) | Additional tags applied to the EKS cluster. | `map(string)` | n/a | yes |
+| <a name="input_cluster_version"></a> [cluster\_version](#input\_cluster\_version) | Kubernetes version for the EKS cluster. | `string` | n/a | yes |
+| <a name="input_create_eip"></a> [create\_eip](#input\_create\_eip) | Create and associate Elastic IP | `bool` | `false` | no |
+| <a name="input_create_kms_key"></a> [create\_kms\_key](#input\_create\_kms\_key) | Create a customer-managed KMS key (CMK) when encryption is enabled and kms\_key\_arn is null. | `bool` | `false` | no |
+| <a name="input_db_allocated_storage"></a> [db\_allocated\_storage](#input\_db\_allocated\_storage) | Allocated storage size in GB. | `number` | n/a | yes |
+| <a name="input_db_backup_retention_period"></a> [db\_backup\_retention\_period](#input\_db\_backup\_retention\_period) | Number of days to retain automated backups. | `number` | n/a | yes |
+| <a name="input_db_deletion_protection"></a> [db\_deletion\_protection](#input\_db\_deletion\_protection) | Enable deletion protection for the RDS instance. | `bool` | n/a | yes |
+| <a name="input_db_engine"></a> [db\_engine](#input\_db\_engine) | Database engine type (e.g., postgres, mysql). | `string` | n/a | yes |
+| <a name="input_db_engine_version"></a> [db\_engine\_version](#input\_db\_engine\_version) | Version of the database engine. | `string` | n/a | yes |
+| <a name="input_db_identifier"></a> [db\_identifier](#input\_db\_identifier) | Unique identifier for the Auth RDS instance. | `string` | n/a | yes |
+| <a name="input_db_identifier_flag"></a> [db\_identifier\_flag](#input\_db\_identifier\_flag) | Unique identifier for the Flag RDS instance. | `string` | n/a | yes |
+| <a name="input_db_identifier_targeting"></a> [db\_identifier\_targeting](#input\_db\_identifier\_targeting) | Unique identifier for the Targeting RDS instance. | `string` | n/a | yes |
+| <a name="input_db_instance_class"></a> [db\_instance\_class](#input\_db\_instance\_class) | RDS instance class. | `string` | n/a | yes |
+| <a name="input_db_max_allocated_storage"></a> [db\_max\_allocated\_storage](#input\_db\_max\_allocated\_storage) | Maximum storage size for autoscaling (in GB). | `number` | n/a | yes |
+| <a name="input_db_multi_az"></a> [db\_multi\_az](#input\_db\_multi\_az) | Enable Multi-AZ deployment. | `bool` | n/a | yes |
+| <a name="input_db_name_auth"></a> [db\_name\_auth](#input\_db\_name\_auth) | Database name for the Auth service. | `string` | n/a | yes |
+| <a name="input_db_name_flag"></a> [db\_name\_flag](#input\_db\_name\_flag) | Database name for the Flag service. | `string` | n/a | yes |
+| <a name="input_db_name_targeting"></a> [db\_name\_targeting](#input\_db\_name\_targeting) | Database name for the Targeting service. | `string` | n/a | yes |
+| <a name="input_db_skip_final_snapshot"></a> [db\_skip\_final\_snapshot](#input\_db\_skip\_final\_snapshot) | Whether to skip the final snapshot before deletion. | `bool` | n/a | yes |
+| <a name="input_db_storage_encrypted"></a> [db\_storage\_encrypted](#input\_db\_storage\_encrypted) | Whether to enable storage encryption. | `bool` | n/a | yes |
+| <a name="input_db_storage_type"></a> [db\_storage\_type](#input\_db\_storage\_type) | Storage type for RDS (e.g., gp3, io1). | `string` | n/a | yes |
+| <a name="input_db_username"></a> [db\_username](#input\_db\_username) | Master username for the RDS instance. | `string` | n/a | yes |
+| <a name="input_default_ipv4_cidr"></a> [default\_ipv4\_cidr](#input\_default\_ipv4\_cidr) | Default IPv4 CIDR allowed in security group rules. | `string` | n/a | yes |
+| <a name="input_deletion_protection"></a> [deletion\_protection](#input\_deletion\_protection) | Enable deletion protection for the EKS cluster. | `bool` | n/a | yes |
+| <a name="input_dynamodb_attributes"></a> [dynamodb\_attributes](#input\_dynamodb\_attributes) | List of DynamoDB table attributes. | <pre>list(object({<br/>    name = string<br/>    type = string<br/>  }))</pre> | n/a | yes |
+| <a name="input_dynamodb_billing_mode"></a> [dynamodb\_billing\_mode](#input\_dynamodb\_billing\_mode) | Billing mode for DynamoDB (PAY\_PER\_REQUEST or PROVISIONED). | `string` | n/a | yes |
+| <a name="input_dynamodb_hash_key"></a> [dynamodb\_hash\_key](#input\_dynamodb\_hash\_key) | Primary hash key for the DynamoDB table. | `string` | n/a | yes |
+| <a name="input_dynamodb_table_name"></a> [dynamodb\_table\_name](#input\_dynamodb\_table\_name) | Name of the DynamoDB table. | `string` | n/a | yes |
+| <a name="input_eks_workers_sg_description"></a> [eks\_workers\_sg\_description](#input\_eks\_workers\_sg\_description) | Description of the EKS workers security group. | `string` | n/a | yes |
+| <a name="input_eks_workers_sg_name"></a> [eks\_workers\_sg\_name](#input\_eks\_workers\_sg\_name) | Name of the EKS workers security group. | `string` | n/a | yes |
+| <a name="input_eks_workers_sg_rules"></a> [eks\_workers\_sg\_rules](#input\_eks\_workers\_sg\_rules) | Security group rule sources allowed to access EKS worker nodes. | <pre>object({<br/>    from_pritunl      = string<br/>    from_self         = string<br/>    from_togglemaster = string<br/>    from_vpc_cidr     = string<br/>  })</pre> | n/a | yes |
+| <a name="input_enable_dns_hostnames"></a> [enable\_dns\_hostnames](#input\_enable\_dns\_hostnames) | Enable DNS hostnames in the VPC. | `bool` | `true` | no |
+| <a name="input_enable_dns_support"></a> [enable\_dns\_support](#input\_enable\_dns\_support) | Enable DNS resolution support in the VPC. | `bool` | `true` | no |
+| <a name="input_enable_kubernetes_tags"></a> [enable\_kubernetes\_tags](#input\_enable\_kubernetes\_tags) | Whether to apply Kubernetes-specific subnet tags. | `bool` | n/a | yes |
+| <a name="input_enable_nat_gateway"></a> [enable\_nat\_gateway](#input\_enable\_nat\_gateway) | Whether to create NAT Gateways. | `bool` | n/a | yes |
+| <a name="input_enable_secrets_encryption"></a> [enable\_secrets\_encryption](#input\_enable\_secrets\_encryption) | Enable EKS secrets encryption using KMS | `bool` | `false` | no |
+| <a name="input_enabled_cluster_log_types"></a> [enabled\_cluster\_log\_types](#input\_enabled\_cluster\_log\_types) | List of EKS control plane logs to enable. | `list(string)` | n/a | yes |
+| <a name="input_endpoint_private_access"></a> [endpoint\_private\_access](#input\_endpoint\_private\_access) | Enable private access to the EKS API server. | `bool` | n/a | yes |
+| <a name="input_endpoint_public_access"></a> [endpoint\_public\_access](#input\_endpoint\_public\_access) | Enable public access to the EKS API server. | `bool` | n/a | yes |
+| <a name="input_fargate_profiles"></a> [fargate\_profiles](#input\_fargate\_profiles) | Configuration map for EKS Fargate profiles. | `any` | n/a | yes |
+| <a name="input_instance_name"></a> [instance\_name](#input\_instance\_name) | Name of the EC2 VPN instance. | `string` | n/a | yes |
+| <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | Instance type for the EC2 VPN server. | `string` | n/a | yes |
+| <a name="input_ip_family"></a> [ip\_family](#input\_ip\_family) | IP family for the cluster (ipv4 or ipv6). | `string` | n/a | yes |
+| <a name="input_launch_template_delete_on_termination"></a> [launch\_template\_delete\_on\_termination](#input\_launch\_template\_delete\_on\_termination) | Whether to delete the EBS volume when the instance is terminated. | `bool` | n/a | yes |
+| <a name="input_launch_template_device_name"></a> [launch\_template\_device\_name](#input\_launch\_template\_device\_name) | Device name exposed to the EC2 instance. | `string` | n/a | yes |
+| <a name="input_launch_template_ebs_optimized"></a> [launch\_template\_ebs\_optimized](#input\_launch\_template\_ebs\_optimized) | Whether the instance is EBS-optimized. | `bool` | n/a | yes |
+| <a name="input_launch_template_encrypted"></a> [launch\_template\_encrypted](#input\_launch\_template\_encrypted) | Whether the EBS volume should be encrypted. | `bool` | n/a | yes |
+| <a name="input_launch_template_instance_type"></a> [launch\_template\_instance\_type](#input\_launch\_template\_instance\_type) | EC2 instance type used in the launch template. | `string` | n/a | yes |
+| <a name="input_launch_template_metadata"></a> [launch\_template\_metadata](#input\_launch\_template\_metadata) | Configuration block for EC2 instance metadata options. | <pre>object({<br/>    http_endpoint               = string<br/>    http_tokens                 = string<br/>    http_put_response_hop_limit = number<br/>    instance_metadata_tags      = string<br/>  })</pre> | n/a | yes |
+| <a name="input_launch_template_name"></a> [launch\_template\_name](#input\_launch\_template\_name) | Name of the EC2 launch template used by EKS node groups. | `string` | n/a | yes |
+| <a name="input_launch_template_tag_resource_types"></a> [launch\_template\_tag\_resource\_types](#input\_launch\_template\_tag\_resource\_types) | List of resource types to tag in the launch template. | `list(string)` | n/a | yes |
+| <a name="input_launch_template_update_default_version"></a> [launch\_template\_update\_default\_version](#input\_launch\_template\_update\_default\_version) | Whether to update the default version of the launch template. | `bool` | n/a | yes |
+| <a name="input_launch_template_volume_iops"></a> [launch\_template\_volume\_iops](#input\_launch\_template\_volume\_iops) | Provisioned IOPS for the EBS volume (if applicable). | `number` | n/a | yes |
+| <a name="input_launch_template_volume_size"></a> [launch\_template\_volume\_size](#input\_launch\_template\_volume\_size) | Size (in GB) of the root EBS volume. | `number` | n/a | yes |
+| <a name="input_launch_template_volume_type"></a> [launch\_template\_volume\_type](#input\_launch\_template\_volume\_type) | Type of EBS volume (e.g., gp3, gp2). | `string` | n/a | yes |
+| <a name="input_launch_template_worker_tag"></a> [launch\_template\_worker\_tag](#input\_launch\_template\_worker\_tag) | Tag applied to worker nodes created from the launch template. | `string` | n/a | yes |
+| <a name="input_manage_master_user_password"></a> [manage\_master\_user\_password](#input\_manage\_master\_user\_password) | Whether AWS should manage the master user password. | `bool` | n/a | yes |
+| <a name="input_max_availability_zones"></a> [max\_availability\_zones](#input\_max\_availability\_zones) | Maximum number of availability zones to use. | `number` | n/a | yes |
+| <a name="input_nodegroup_az_mapping"></a> [nodegroup\_az\_mapping](#input\_nodegroup\_az\_mapping) | Mapping of node groups to specific availability zones. | `any` | n/a | yes |
+| <a name="input_nodegroup_max_unavailable"></a> [nodegroup\_max\_unavailable](#input\_nodegroup\_max\_unavailable) | Maximum number of unavailable nodes during update. | `number` | n/a | yes |
+| <a name="input_nodegroups"></a> [nodegroups](#input\_nodegroups) | Configuration map for EKS managed node groups. | `any` | n/a | yes |
+| <a name="input_pod_identity_associations"></a> [pod\_identity\_associations](#input\_pod\_identity\_associations) | Pod identity associations for IAM roles in EKS. | `any` | n/a | yes |
+| <a name="input_region"></a> [region](#input\_region) | AWS region where all resources will be deployed. | `string` | n/a | yes |
+| <a name="input_service_ipv4_cidr"></a> [service\_ipv4\_cidr](#input\_service\_ipv4\_cidr) | CIDR block for Kubernetes service IP addresses. | `string` | n/a | yes |
+| <a name="input_single_nat_gateway"></a> [single\_nat\_gateway](#input\_single\_nat\_gateway) | Whether to use a single shared NAT Gateway. | `bool` | n/a | yes |
+| <a name="input_sqs_message_retention"></a> [sqs\_message\_retention](#input\_sqs\_message\_retention) | Message retention period for the SQS queue (in seconds). | `number` | n/a | yes |
+| <a name="input_sqs_queue_name"></a> [sqs\_queue\_name](#input\_sqs\_queue\_name) | Name of the SQS queue. | `string` | n/a | yes |
+| <a name="input_sqs_receive_wait_time"></a> [sqs\_receive\_wait\_time](#input\_sqs\_receive\_wait\_time) | Receive wait time for long polling (in seconds). | `number` | n/a | yes |
+| <a name="input_sqs_visibility_timeout"></a> [sqs\_visibility\_timeout](#input\_sqs\_visibility\_timeout) | Visibility timeout for the SQS queue (in seconds). | `number` | n/a | yes |
+| <a name="input_subnet_newbits"></a> [subnet\_newbits](#input\_subnet\_newbits) | Number of additional bits to create subnets from the VPC CIDR. | `number` | n/a | yes |
+| <a name="input_support_type"></a> [support\_type](#input\_support\_type) | EKS support type (e.g., STANDARD or EXTENDED). | `string` | n/a | yes |
+| <a name="input_tag_ambiente"></a> [tag\_ambiente](#input\_tag\_ambiente) | Additional environment tag used for resource identification. | `string` | n/a | yes |
+| <a name="input_tag_environment"></a> [tag\_environment](#input\_tag\_environment) | Environment tag applied to all resources (e.g., dev, staging, prod). | `string` | n/a | yes |
+| <a name="input_vpc_cidr_block"></a> [vpc\_cidr\_block](#input\_vpc\_cidr\_block) | CIDR block for the VPC. | `string` | n/a | yes |
+| <a name="input_vpc_name"></a> [vpc\_name](#input\_vpc\_name) | Name of the VPC. | `string` | n/a | yes |
+| <a name="input_vpn_associate_public_ip"></a> [vpn\_associate\_public\_ip](#input\_vpn\_associate\_public\_ip) | Whether to associate a public IP to the VPN instance. | `bool` | n/a | yes |
+| <a name="input_vpn_instance_profile"></a> [vpn\_instance\_profile](#input\_vpn\_instance\_profile) | IAM instance profile attached to the VPN EC2 instance. | `string` | n/a | yes |
+| <a name="input_vpn_volume_size"></a> [vpn\_volume\_size](#input\_vpn\_volume\_size) | EBS volume size for the VPN instance. | `number` | n/a | yes |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_auth_service_endpoint"></a> [auth\_service\_endpoint](#output\_auth\_service\_endpoint) | Endpoint do banco de dados RDS |
+| <a name="output_auth_service_security_group"></a> [auth\_service\_security\_group](#output\_auth\_service\_security\_group) | Security group criado para auth-service |
+| <a name="output_cluster_arn"></a> [cluster\_arn](#output\_cluster\_arn) | ARN of the EKS cluster. |
+| <a name="output_cluster_endpoint"></a> [cluster\_endpoint](#output\_cluster\_endpoint) | Endpoint URL of the EKS cluster API server. |
+| <a name="output_cluster_name"></a> [cluster\_name](#output\_cluster\_name) | Name of the EKS cluster. |
+| <a name="output_dynamodb_table_arn"></a> [dynamodb\_table\_arn](#output\_dynamodb\_table\_arn) | ARN of the DynamoDB table |
+| <a name="output_dynamodb_table_name"></a> [dynamodb\_table\_name](#output\_dynamodb\_table\_name) | Name of the DynamoDB table |
+| <a name="output_flag_service_endpoint"></a> [flag\_service\_endpoint](#output\_flag\_service\_endpoint) | Endpoint do banco de dados RDS |
+| <a name="output_flag_service_security_group"></a> [flag\_service\_security\_group](#output\_flag\_service\_security\_group) | Security group criado para flag-service |
+| <a name="output_kubeconfig_command"></a> [kubeconfig\_command](#output\_kubeconfig\_command) | Comando para configurar o kubectl localmente |
+| <a name="output_lab_role_arn"></a> [lab\_role\_arn](#output\_lab\_role\_arn) | ARN of the IAM role used for the lab environment. |
+| <a name="output_nodegroup_ids"></a> [nodegroup\_ids](#output\_nodegroup\_ids) | List of IDs of the EKS managed node groups. |
+| <a name="output_private_subnet_ids"></a> [private\_subnet\_ids](#output\_private\_subnet\_ids) | Private subnet IDs |
+| <a name="output_public_subnet_ids"></a> [public\_subnet\_ids](#output\_public\_subnet\_ids) | Public subnet IDs |
+| <a name="output_redis_kms_key_arn"></a> [redis\_kms\_key\_arn](#output\_redis\_kms\_key\_arn) | KMS key ARN used for Redis at-rest encryption. |
+| <a name="output_redis_primary_endpoint"></a> [redis\_primary\_endpoint](#output\_redis\_primary\_endpoint) | Primary endpoint address of the Redis replication group. |
+| <a name="output_redis_reader_endpoint"></a> [redis\_reader\_endpoint](#output\_redis\_reader\_endpoint) | Reader endpoint address of the Redis replication group. |
+| <a name="output_redis_security_group_id"></a> [redis\_security\_group\_id](#output\_redis\_security\_group\_id) | Security group ID associated with the Redis cluster. |
+| <a name="output_sqs_dlq_url"></a> [sqs\_dlq\_url](#output\_sqs\_dlq\_url) | URL da Dead Letter Queue |
+| <a name="output_sqs_queue_url"></a> [sqs\_queue\_url](#output\_sqs\_queue\_url) | URL da fila SQS principal |
+| <a name="output_targeting_service_endpoint"></a> [targeting\_service\_endpoint](#output\_targeting\_service\_endpoint) | Endpoint do banco de dados RDS |
+| <a name="output_targeting_service_security_group"></a> [targeting\_service\_security\_group](#output\_targeting\_service\_security\_group) | Security group criado para targeting-service |
+| <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | VPC ID |
+| <a name="output_vpn_ec2_public_ip"></a> [vpn\_ec2\_public\_ip](#output\_vpn\_ec2\_public\_ip) | Public IP do VPN EC2 (EIP se create\_eip=true, senão public\_ip da instância) |
 <!-- END_TF_DOCS -->
 
 ## 📄 Licença
