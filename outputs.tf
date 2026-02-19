@@ -75,15 +75,15 @@ output "kubeconfig_command" {
 
 output "auth_service_endpoint" {
   description = "Endpoint do banco de dados RDS"
-  value       = module.auth_service_rds.db_instance_endpoint
+  value       = module.rds_auth_service.db_instance_endpoint
 }
 output "flag_service_endpoint" {
   description = "Endpoint do banco de dados RDS"
-  value       = module.flag_service_rds.db_instance_endpoint
+  value       = module.rds_flag_service.db_instance_endpoint
 }
 output "targeting_service_endpoint" {
   description = "Endpoint do banco de dados RDS"
-  value       = module.targeting_service_rds.db_instance_endpoint
+  value       = module.rds_targeting_service.db_instance_endpoint
 }
 
 output "dynamodb_table_name" {
