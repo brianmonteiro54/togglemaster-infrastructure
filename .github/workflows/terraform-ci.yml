@@ -313,16 +313,24 @@ jobs:
             --framework terraform \
             --download-external-modules true \
             --var-file envs/${{ steps.env.outputs.ENV_NAME }}/terraform.tfvars \
-            --skip-path .external_modules \
             --output cli \
             --output json \
             --output-file-path console,checkov-report.json \
             --quiet \
             --compact \
             --skip-check CKV_AWS_119,CKV_AWS_28 \
-            2>&1 | tee checkov_output.txt || true
+            2>&1 | tee checkov_output.txt
 
-          echo "exitcode=${PIPESTATUS[0]:-0}" >> "$GITHUB_OUTPUT"
+          # Captura o exit code do Checkov (o primeiro comando do pipe)
+          CHECKOV_EXIT_CODE=${PIPESTATUS[0]}
+          
+          echo "exitcode=$CHECKOV_EXIT_CODE" >> "$GITHUB_OUTPUT"
+          
+          # Se o código for diferente de 0, o script encerra aqui e falha o step
+          if [ $CHECKOV_EXIT_CODE -ne 0 ]; then
+            echo "❌ Checkov encontrou falhas críticas de segurança."
+            exit $CHECKOV_EXIT_CODE
+          fi
           
       
       - name: 🔍 Debug - Inspeção Profunda de Variáveis
