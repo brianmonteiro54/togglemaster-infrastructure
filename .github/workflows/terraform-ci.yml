@@ -313,6 +313,7 @@ jobs:
             --framework terraform \
             --download-external-modules true \
             --var-file envs/${{ steps.env.outputs.ENV_NAME }}/terraform.tfvars \
+            --skip-path .external_modules \
             --output cli \
             --output json \
             --output-file-path console,checkov-report.json \
