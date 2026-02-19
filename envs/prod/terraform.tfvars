@@ -58,7 +58,7 @@ eks_workers_sg_rules = {
 # =============================================================================
 # Security Groups - Redis
 # =============================================================================
-auth_token = "coloque-um-token-forte-com-16-ou-mais"
+
 
 
 # =============================================================================
@@ -93,7 +93,7 @@ cluster_version   = "1.34"
 service_ipv4_cidr = "10.43.0.0/16"
 ip_family         = "ipv4"
 
-enabled_cluster_log_types = ["api", "audit"]
+enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 support_type              = "EXTENDED"
 deletion_protection       = true
 
@@ -132,10 +132,8 @@ nodegroups = {
     instance_types  = []
     version         = "1.34"
     release_version = "1.34.3-20260209"
-    labels = {
-      "cattle.io/cluster-agent" = "true"
-    }
-    tags = {}
+    labels          = {}
+    tags            = {}
   }
   "ToggleMaster-prd-private-1b-01" = {
     scaling_min     = 1
@@ -146,10 +144,8 @@ nodegroups = {
     instance_types  = []
     version         = "1.34"
     release_version = "1.34.3-20260209"
-    labels = {
-      "cattle.io/cluster-agent" = "true"
-    }
-    tags = {}
+    labels          = {}
+    tags            = {}
   }
 }
 
@@ -187,9 +183,9 @@ db_storage_encrypted     = true
 
 # Alta Disponibilidade e Backup
 db_multi_az                = false
-db_backup_retention_period = 0
+db_backup_retention_period = 7
 db_skip_final_snapshot     = true
-db_deletion_protection     = false
+db_deletion_protection     = true
 
 # =============================================================================
 # DynamoDB

@@ -16,7 +16,7 @@ subnet_newbits         = 4
 
 # Estratégia de NAT Gateway
 enable_nat_gateway = true
-single_nat_gateway = false
+single_nat_gateway = true
 
 enable_kubernetes_tags = true
 
@@ -56,9 +56,9 @@ eks_workers_sg_rules = {
 }
 
 # =============================================================================
-# Security Groups - Redis
+# - Redis
 # =============================================================================
-auth_token = "coloque-um-token-forte-com-16-ou-mais"
+
 
 
 # =============================================================================
@@ -95,7 +95,7 @@ ip_family         = "ipv4"
 
 enabled_cluster_log_types = ["api", "audit"]
 support_type              = "EXTENDED"
-deletion_protection       = true
+deletion_protection       = false
 
 endpoint_private_access = true
 endpoint_public_access  = false
@@ -132,10 +132,8 @@ nodegroups = {
     instance_types  = []
     version         = "1.34"
     release_version = "1.34.3-20260209"
-    labels = {
-      "cattle.io/cluster-agent" = "true"
-    }
-    tags = {}
+    labels          = {}
+    tags            = {}
   }
   "ToggleMaster-prd-private-1b-01" = {
     scaling_min     = 1
@@ -146,10 +144,8 @@ nodegroups = {
     instance_types  = []
     version         = "1.34"
     release_version = "1.34.3-20260209"
-    labels = {
-      "cattle.io/cluster-agent" = "true"
-    }
-    tags = {}
+    labels          = {}
+    tags            = {}
   }
 }
 

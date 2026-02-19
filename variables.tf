@@ -475,10 +475,15 @@ variable "auth_token" {
   description = "Redis AUTH token (min 16 chars, max 128 chars)"
   type        = string
   default     = null
+  nullable    = true
   sensitive   = true
 
   validation {
-    condition     = var.auth_token == null || (length(var.auth_token) >= 16 && length(var.auth_token) <= 128)
+    condition = try(
+      length(var.auth_token) >= 16 &&
+      length(var.auth_token) <= 128,
+      var.auth_token == null
+    )
     error_message = "Auth token must be between 16 and 128 characters."
   }
 }
