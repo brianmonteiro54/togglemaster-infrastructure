@@ -200,7 +200,6 @@ jobs:
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color 2>&1 | tee validate_output.txt
-        continue-on-error: true
 
       - name: Comment PR — Validate
         if: github.event_name == 'pull_request'
