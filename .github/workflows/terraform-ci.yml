@@ -729,8 +729,8 @@ jobs:
           | Job | Resultado | Tipo |
           |-----|-----------|------|
           | Lint & Format | \`${{ needs.lint-format.result }}\` | 🔒 Bloqueante |
-          | Validate      | \`${{ needs.validate.result }}\`    | ⚠️ Warning |
-          | Security      | \`${{ needs.security.result }}\`    | ⚠️ Warning |
+          | Validate      | \`${{ needs.validate.result }}\`    | 🔒 Bloqueante  |
+          | Security      | \`${{ needs.security.result }}\`    | 🔒 Bloqueante  |
 
           _Branch: \`${{ github.ref_name }}\` · Commit: \`${{ github.sha }}\`_
           EOF
