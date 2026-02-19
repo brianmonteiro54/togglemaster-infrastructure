@@ -368,6 +368,7 @@ jobs:
           scan-type: 'config'
           scan-ref: '.'
           trivy-config: trivy.yaml
+          trivyignores: '.trivyignore'
           severity: 'MEDIUM,HIGH,CRITICAL'
           exit-code: '1'
           format: 'table'
@@ -382,6 +383,7 @@ jobs:
           scan-type: 'config'
           scan-ref: '.'
           trivy-config: trivy.yaml
+          trivyignores: '.trivyignore'
           severity: 'MEDIUM,HIGH,CRITICAL'
           format: 'sarif'
           output: 'trivy-results.sarif'
