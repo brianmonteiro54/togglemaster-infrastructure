@@ -183,7 +183,7 @@ db_storage_encrypted     = true
 
 # Alta Disponibilidade e Backup
 db_multi_az                = false
-db_backup_retention_period = 0
+db_backup_retention_period = 7
 db_skip_final_snapshot     = true
 db_deletion_protection     = true
 
