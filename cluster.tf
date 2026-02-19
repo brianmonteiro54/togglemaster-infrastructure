@@ -2,6 +2,8 @@
 # EKS Cluster Module Call
 # =============================================================================
 module "eks" {
+  # checkov:skip=CKV_AWS_38:Public access is disabled via endpoint_public_access variable in tfvars
+  # checkov:skip=CKV_AWS_37:All log types are enabled in tfvars but not mapped by scanner
   source = "github.com/brianmonteiro54/terraform-aws-eks-platform//modules/eks?ref=15a9fc3c01f7f4428abdcbf57adbc178e38c95dc"
 
 

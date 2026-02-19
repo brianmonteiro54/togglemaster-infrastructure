@@ -331,33 +331,6 @@ jobs:
             echo "❌ Checkov encontrou falhas críticas de segurança."
             exit $CHECKOV_EXIT_CODE
           fi
-          
-      
-      - name: 🔍 Debug - Inspeção Profunda de Variáveis
-        id: debug_vars
-        run: |
-          echo "======= CHECKPOINT DE AMBIENTE ======="
-          echo "Ambiente: ${{ steps.env.outputs.ENV_NAME }}"
-          PATH_TFVARS="envs/${{ steps.env.outputs.ENV_NAME }}/terraform.tfvars"
-          
-          if [ -f "$PATH_TFVARS" ]; then
-            echo "✅ Arquivo encontrado em: $PATH_TFVARS"
-            echo "---------------------------------------"
-            echo "CONTEÚDO BRUTO (cat):"
-            cat "$PATH_TFVARS"
-            echo -e "\n---------------------------------------"
-            echo "BUSCA POR PALAVRA-CHAVE (grep):"
-            # O grep -i ignora maiúsculas/minúsculas
-            # O tr -d remove possíveis caracteres ocultos de Windows (\r)
-            cat "$PATH_TFVARS" | tr -d '\r' | grep -i "public_access" || echo "❌ Variável não encontrada via grep"
-            echo "---------------------------------------"
-          else
-            echo "❌ ERRO CRÍTICO: Arquivo não existe em $PATH_TFVARS"
-            echo "Arquivos disponíveis no diretório envs/:"
-            ls -R envs/
-            exit 1
-          fi
-
       - name: Upload Checkov report
         if: always()
         uses: actions/upload-artifact@v4
