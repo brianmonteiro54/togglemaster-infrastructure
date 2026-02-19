@@ -67,7 +67,7 @@ O **ToggleMaster** é uma plataforma de Feature Flags baseada em microsserviços
 │                                                                          │
 │  ┌── Serverless ──────────┐  ┌── Container Registry ──────────────────┐  │
 │  │  DynamoDB Analytics    │  │  ECR: auth / flag / targeting /        │  │
-│  │  SQS Events Queue     │  │       evaluation / analytics            │  │
+│  │  SQS Events Queue      │  │       evaluation / analytics           │  │
 │  └────────────────────────┘  └────────────────────────────────────────┘  │
 │                                                                          │
 │  ┌── State Management ──────────────┐                                    │
