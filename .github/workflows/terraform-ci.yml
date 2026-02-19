@@ -354,11 +354,12 @@ jobs:
 
       - name: Generate Trivy Config
         run: |
-          echo 'misconfiguration:' > trivy.yaml
-          echo '  terraform:' >> trivy.yaml
-          echo '    vars:' >> trivy.yaml
-          echo "      - envs/${{ steps.env.outputs.ENV_NAME }}/terraform.tfvars" >> trivy.yaml
-          echo "--- Generated trivy.yaml ---"
+          cat > trivy.yaml << EOF
+          misconfiguration:
+            terraform:
+              vars:
+                - envs/${{ steps.env.outputs.ENV_NAME }}/terraform.tfvars
+          EOF
           cat trivy.yaml
 
       - name: Run Trivy IaC scanner (Table)
@@ -373,6 +374,7 @@ jobs:
           format: 'table'
           output: 'trivy_output.txt'
           version: 'v0.69.1'
+          skip-dirs: '.external_modules,.terraform'
         continue-on-error: true
 
       - name: Trivy SARIF report
@@ -387,6 +389,7 @@ jobs:
           output: 'trivy-results.sarif'
           skip-setup-trivy: true
           version: 'v0.69.1'
+          skip-dirs: '.external_modules,.terraform'
         continue-on-error: true
 
       # ── Comentário consolidado no PR ────────────────────────────────────────
