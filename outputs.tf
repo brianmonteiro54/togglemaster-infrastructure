@@ -75,15 +75,15 @@ output "kubeconfig_command" {
 
 output "auth_service_endpoint" {
   description = "Endpoint do banco de dados RDS"
-  value       = module.auth_service_rds.db_instance_endpoint
+  value       = module.rds_auth_service.db_instance_endpoint
 }
 output "flag_service_endpoint" {
   description = "Endpoint do banco de dados RDS"
-  value       = module.flag_service_rds.db_instance_endpoint
+  value       = module.rds_flag_service.db_instance_endpoint
 }
 output "targeting_service_endpoint" {
   description = "Endpoint do banco de dados RDS"
-  value       = module.targeting_service_rds.db_instance_endpoint
+  value       = module.rds_targeting_service.db_instance_endpoint
 }
 
 output "dynamodb_table_name" {
@@ -98,18 +98,19 @@ output "dynamodb_table_arn" {
 
 output "auth_service_security_group" {
   description = "Security group criado para auth-service"
-  value       = module.auth_service_rds.security_group_id
+  value       = module.rds_auth_service.security_group_id
 }
 
 output "flag_service_security_group" {
   description = "Security group criado para flag-service"
-  value       = module.flag_service_rds.security_group_id
+  value       = module.rds_flag_service.security_group_id
 }
 
 output "targeting_service_security_group" {
   description = "Security group criado para targeting-service"
-  value       = module.targeting_service_rds.security_group_id
+  value       = module.rds_targeting_service.security_group_id
 }
+
 
 output "redis_primary_endpoint" {
   description = "Primary endpoint address of the Redis replication group."

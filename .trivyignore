@@ -1,0 +1,21 @@
+# Egress irrestrito
+AVD-AWS-0104
+
+# ECR scan
+AVD-AWS-0030
+
+# RDS backup
+AVD-AWS-0077
+AVD-AWS-0177
+
+# EKS logging
+AVD-AWS-0038
+
+# SQS policy
+AVD-AWS-0097
+
+# Subnet pública
+AVD-AWS-0164
+
+# VPC Flow Logs
+AVD-AWS-0178
