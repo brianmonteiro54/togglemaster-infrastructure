@@ -669,7 +669,6 @@ jobs:
           output-file: README.md
           output-method: inject
           git-push: true
-          recursive: true
         continue-on-error: true
 
 # =============================================================================
