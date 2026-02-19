@@ -374,7 +374,6 @@ jobs:
           output: 'trivy_output.txt'
           version: 'v0.69.1'
           skip-dirs: '.external_modules,.terraform'
-        continue-on-error: true
 
       - name: Trivy SARIF report
         if: always()
@@ -389,14 +388,12 @@ jobs:
           skip-setup-trivy: true
           version: 'v0.69.1'
           skip-dirs: '.external_modules,.terraform'
-        continue-on-error: true
       - name: Upload Trivy SARIF to GitHub Security
         if: always()
         uses: github/codeql-action/upload-sarif@v4.32.3
         with:
           sarif_file: trivy-results.sarif
           category: trivy-iac
-        continue-on-error: true
 
       - name: Upload Trivy reports
         if: always()
