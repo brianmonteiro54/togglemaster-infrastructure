@@ -18,6 +18,7 @@ Como o endpoint do EKS é **público** nesta branch, não é necessário usar VP
 Após o `terraform apply`, a VPN (Pritunl) pode ser destruída para economizar recursos.
 
 ---
+
 ## Como usar
 
 ### 1. Inicializar o Terraform
@@ -25,6 +26,7 @@ Após o `terraform apply`, a VPN (Pritunl) pode ser destruída para economizar r
 ```bash
 terraform init
 ```
+
 ### 2. Provisionar a infraestrutura
 
 ```bash
