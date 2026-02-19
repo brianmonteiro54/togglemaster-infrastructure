@@ -391,6 +391,24 @@ jobs:
           version: 'v0.69.1'
           skip-dirs: '.external_modules,.terraform'
         continue-on-error: true
+      - name: Upload Trivy SARIF to GitHub Security
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-iac
+        continue-on-error: true
+
+      - name: Upload Trivy reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-reports-${{ github.sha }}
+          path: |
+            trivy_output.txt
+            trivy-results.sarif
+          retention-days: 30
+          if-no-files-found: warn
 
       # ── Comentário consolidado no PR ────────────────────────────────────────
       - name: Comment PR — Security
