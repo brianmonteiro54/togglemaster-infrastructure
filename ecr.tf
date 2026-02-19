@@ -2,7 +2,7 @@
 # ECR Module Call - ToggleMaster Repositories
 # =============================================================================
 
-module "auth_service_ecr" {
+module "ecr_auth_service" {
   # checkov:skip=CKV_AWS_163:canning is disable in tfvars scanner
   source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=446bd6c6d9edefa5fa844c32b1dffc2efec14bfe"
 
@@ -34,7 +34,7 @@ module "auth_service_ecr" {
   }
 }
 
-module "flag_service_ecr" {
+module "ecr_flag_service" {
   # checkov:skip=CKV_AWS_163:canning is disable in tfvars scanner
   source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=446bd6c6d9edefa5fa844c32b1dffc2efec14bfe"
 
@@ -66,7 +66,7 @@ module "flag_service_ecr" {
   }
 }
 
-module "targeting_service_ecr" {
+module "ecr_targeting_service" {
   # checkov:skip=CKV_AWS_163:canning is disable in tfvars scanner
   source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=446bd6c6d9edefa5fa844c32b1dffc2efec14bfe"
 
@@ -98,7 +98,7 @@ module "targeting_service_ecr" {
   }
 }
 
-module "evaluation_service_ecr" {
+module "ecr_evaluation_service" {
   # checkov:skip=CKV_AWS_163:canning is disable in tfvars scanner
   source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=446bd6c6d9edefa5fa844c32b1dffc2efec14bfe"
 
@@ -130,7 +130,7 @@ module "evaluation_service_ecr" {
   }
 }
 
-module "analytics_service_ecr" {
+module "ecr_analytics_service" {
   # checkov:skip=CKV_AWS_163:canning is disable in tfvars scanner
   source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=446bd6c6d9edefa5fa844c32b1dffc2efec14bfe"
 

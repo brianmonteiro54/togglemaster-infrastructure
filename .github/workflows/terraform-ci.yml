@@ -655,6 +655,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: github.event_name == 'pull_request'
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
@@ -669,7 +671,6 @@ jobs:
           output-file: README.md
           output-method: inject
           git-push: true
-          recursive: true
         continue-on-error: true
 
 # =============================================================================
