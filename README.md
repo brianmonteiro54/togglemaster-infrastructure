@@ -309,7 +309,7 @@ A seção abaixo é **automaticamente populada** pelo [terraform-docs](https://t
 | <a name="module_rds_targeting_service"></a> [rds\_targeting\_service](#module\_rds\_targeting\_service) | github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds | 5c6fa8000f697b76747c2a4c35680a08991b27be |
 | <a name="module_redis"></a> [redis](#module\_redis) | github.com/brianmonteiro54/terraform-aws-redis-elasticache//modules/redis | d8438ce626269b08e31529e7f302683acf10dedb |
 | <a name="module_sqs_events"></a> [sqs\_events](#module\_sqs\_events) | github.com/brianmonteiro54/terraform-aws-sqs//modules/sqs | fba066708138b481bcdad0ef73176cd9c294d185 |
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | https://github.com/brianmonteiro54/terraform-aws-vpc-network.git//modules/vpc | 8d9e89b240e4843d472192cf5e04339f7518832a |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | github.com/brianmonteiro54/terraform-aws-vpc-network//modules/vpc | 8d9e89b240e4843d472192cf5e04339f7518832a |
 
 ## Resources
 
