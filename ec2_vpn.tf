@@ -64,4 +64,6 @@ module "pritunl_vpn" {
   enable_cloudwatch_alarms = true
   enable_auto_recovery     = true
 
+  depends_on = [module.vpc]
+
 }
