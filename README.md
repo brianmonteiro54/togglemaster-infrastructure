@@ -303,13 +303,13 @@ A seção abaixo é **automaticamente populada** pelo [terraform-docs](https://t
 | <a name="module_ecr_flag_service"></a> [ecr\_flag\_service](#module\_ecr\_flag\_service) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | 446bd6c6d9edefa5fa844c32b1dffc2efec14bfe |
 | <a name="module_ecr_targeting_service"></a> [ecr\_targeting\_service](#module\_ecr\_targeting\_service) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | 446bd6c6d9edefa5fa844c32b1dffc2efec14bfe |
 | <a name="module_eks"></a> [eks](#module\_eks) | github.com/brianmonteiro54/terraform-aws-eks-platform//modules/eks | 15a9fc3c01f7f4428abdcbf57adbc178e38c95dc |
-| <a name="module_pritunl_vpn"></a> [pritunl\_vpn](#module\_pritunl\_vpn) | github.com/brianmonteiro54/terraform-aws-ec2//modules/ec2 | 7697a207824dba770c38caafe88b7fd080d60b03 |
+| <a name="module_pritunl_vpn"></a> [pritunl\_vpn](#module\_pritunl\_vpn) | github.com/brianmonteiro54/terraform-aws-ec2//modules/ec2 | a2daf568dc5d26fafc24a59ee65a740821a928dc |
 | <a name="module_rds_auth_service"></a> [rds\_auth\_service](#module\_rds\_auth\_service) | github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds | 5c6fa8000f697b76747c2a4c35680a08991b27be |
 | <a name="module_rds_flag_service"></a> [rds\_flag\_service](#module\_rds\_flag\_service) | github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds | 5c6fa8000f697b76747c2a4c35680a08991b27be |
 | <a name="module_rds_targeting_service"></a> [rds\_targeting\_service](#module\_rds\_targeting\_service) | github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds | 5c6fa8000f697b76747c2a4c35680a08991b27be |
 | <a name="module_redis"></a> [redis](#module\_redis) | github.com/brianmonteiro54/terraform-aws-redis-elasticache//modules/redis | d8438ce626269b08e31529e7f302683acf10dedb |
 | <a name="module_sqs_events"></a> [sqs\_events](#module\_sqs\_events) | github.com/brianmonteiro54/terraform-aws-sqs//modules/sqs | fba066708138b481bcdad0ef73176cd9c294d185 |
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | github.com/brianmonteiro54/terraform-aws-vpc-network//modules/vpc | 8d9e89b240e4843d472192cf5e04339f7518832a |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | github.com/brianmonteiro54/terraform-aws-vpc-network//modules/vpc | b750a8b0abd12ed962daa4137a0926b333afd13b |
 
 ## Resources
 
