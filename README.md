@@ -296,20 +296,20 @@ A seção abaixo é **automaticamente populada** pelo [terraform-docs](https://t
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_dynamodb_analytics"></a> [dynamodb\_analytics](#module\_dynamodb\_analytics) | github.com/brianmonteiro54/terraform-aws-dynamodb//modules/dynamodb | 14cd6820a976950103142b08d50eb668ade2414a |
-| <a name="module_ecr_analytics_service"></a> [ecr\_analytics\_service](#module\_ecr\_analytics\_service) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | 446bd6c6d9edefa5fa844c32b1dffc2efec14bfe |
-| <a name="module_ecr_auth_service"></a> [ecr\_auth\_service](#module\_ecr\_auth\_service) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | 446bd6c6d9edefa5fa844c32b1dffc2efec14bfe |
-| <a name="module_ecr_evaluation_service"></a> [ecr\_evaluation\_service](#module\_ecr\_evaluation\_service) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | 446bd6c6d9edefa5fa844c32b1dffc2efec14bfe |
-| <a name="module_ecr_flag_service"></a> [ecr\_flag\_service](#module\_ecr\_flag\_service) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | 446bd6c6d9edefa5fa844c32b1dffc2efec14bfe |
-| <a name="module_ecr_targeting_service"></a> [ecr\_targeting\_service](#module\_ecr\_targeting\_service) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | 446bd6c6d9edefa5fa844c32b1dffc2efec14bfe |
-| <a name="module_eks"></a> [eks](#module\_eks) | github.com/brianmonteiro54/terraform-aws-eks-platform//modules/eks | 15a9fc3c01f7f4428abdcbf57adbc178e38c95dc |
-| <a name="module_pritunl_vpn"></a> [pritunl\_vpn](#module\_pritunl\_vpn) | github.com/brianmonteiro54/terraform-aws-ec2//modules/ec2 | a2daf568dc5d26fafc24a59ee65a740821a928dc |
-| <a name="module_rds_auth_service"></a> [rds\_auth\_service](#module\_rds\_auth\_service) | github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds | 5c6fa8000f697b76747c2a4c35680a08991b27be |
-| <a name="module_rds_flag_service"></a> [rds\_flag\_service](#module\_rds\_flag\_service) | github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds | 5c6fa8000f697b76747c2a4c35680a08991b27be |
-| <a name="module_rds_targeting_service"></a> [rds\_targeting\_service](#module\_rds\_targeting\_service) | github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds | 5c6fa8000f697b76747c2a4c35680a08991b27be |
-| <a name="module_redis"></a> [redis](#module\_redis) | github.com/brianmonteiro54/terraform-aws-redis-elasticache//modules/redis | d8438ce626269b08e31529e7f302683acf10dedb |
-| <a name="module_sqs_events"></a> [sqs\_events](#module\_sqs\_events) | github.com/brianmonteiro54/terraform-aws-sqs//modules/sqs | fba066708138b481bcdad0ef73176cd9c294d185 |
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | github.com/brianmonteiro54/terraform-aws-vpc-network//modules/vpc | b750a8b0abd12ed962daa4137a0926b333afd13b |
+| <a name="module_dynamodb_analytics"></a> [dynamodb\_analytics](#module\_dynamodb\_analytics) | github.com/brianmonteiro54/terraform-aws-dynamodb//modules/dynamodb | a6c709e9341f1e0ac0a1d4a4455242779870b574 |
+| <a name="module_ecr_analytics_service"></a> [ecr\_analytics\_service](#module\_ecr\_analytics\_service) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | cd3e5888aea1635f027fee81c0620d21a48ca7a1 |
+| <a name="module_ecr_auth_service"></a> [ecr\_auth\_service](#module\_ecr\_auth\_service) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | cd3e5888aea1635f027fee81c0620d21a48ca7a1 |
+| <a name="module_ecr_evaluation_service"></a> [ecr\_evaluation\_service](#module\_ecr\_evaluation\_service) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | cd3e5888aea1635f027fee81c0620d21a48ca7a1 |
+| <a name="module_ecr_flag_service"></a> [ecr\_flag\_service](#module\_ecr\_flag\_service) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | cd3e5888aea1635f027fee81c0620d21a48ca7a1 |
+| <a name="module_ecr_targeting_service"></a> [ecr\_targeting\_service](#module\_ecr\_targeting\_service) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | cd3e5888aea1635f027fee81c0620d21a48ca7a1 |
+| <a name="module_eks"></a> [eks](#module\_eks) | github.com/brianmonteiro54/terraform-aws-eks-platform//modules/eks | bac2dd56b1134c2f88ae12b17ac0ad38761ac27c |
+| <a name="module_pritunl_vpn"></a> [pritunl\_vpn](#module\_pritunl\_vpn) | github.com/brianmonteiro54/terraform-aws-ec2//modules/ec2 | a4533e1bfecbaab8e192529e12e626ef88da61de |
+| <a name="module_rds_auth_service"></a> [rds\_auth\_service](#module\_rds\_auth\_service) | github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds | 9d7ccbecaddaaf20a2deb5112432f5f44864f0a3 |
+| <a name="module_rds_flag_service"></a> [rds\_flag\_service](#module\_rds\_flag\_service) | github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds | 9d7ccbecaddaaf20a2deb5112432f5f44864f0a3 |
+| <a name="module_rds_targeting_service"></a> [rds\_targeting\_service](#module\_rds\_targeting\_service) | github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds | 9d7ccbecaddaaf20a2deb5112432f5f44864f0a3 |
+| <a name="module_redis"></a> [redis](#module\_redis) | github.com/brianmonteiro54/terraform-aws-redis-elasticache//modules/redis | 2e27d5725a41eb0a2681e49b5361c5a8cef8f024 |
+| <a name="module_sqs_events"></a> [sqs\_events](#module\_sqs\_events) | github.com/brianmonteiro54/terraform-aws-sqs//modules/sqs | 50d474433c8aa3e3839a5a97a7fe57289c1aec1b |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | github.com/brianmonteiro54/terraform-aws-vpc-network//modules/vpc | a59e606347482c7fcd1428eebdd00620a649b380 |
 
 ## Resources
 
