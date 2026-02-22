@@ -1,5 +1,5 @@
 module "vpc" {
-  source = "git::https://github.com/brianmonteiro54/terraform-aws-vpc-network.git//modules/vpc?ref=b750a8b0abd12ed962daa4137a0926b333afd13b"
+  source = "git::https://github.com/brianmonteiro54/terraform-aws-vpc-network.git//modules/vpc?ref=a59e606347482c7fcd1428eebdd00620a649b380"
 
 
 

@@ -2,7 +2,7 @@
 # auth-service Database
 # =============================================================================
 module "auth_service_rds" {
-  source = "github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds?ref=5c6fa8000f697b76747c2a4c35680a08991b27be"
+  source = "github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds?ref=9d7ccbecaddaaf20a2deb5112432f5f44864f0a3"
 
   db_identifier = var.db_identifier
   environment   = var.tag_environment
@@ -50,7 +50,7 @@ module "auth_service_rds" {
 # flag-service Database
 # =============================================================================
 module "flag_service_rds" {
-  source = "github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds?ref=5c6fa8000f697b76747c2a4c35680a08991b27be"
+  source = "github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds?ref=9d7ccbecaddaaf20a2deb5112432f5f44864f0a3"
 
   db_identifier = var.db_identifier_flag
   environment   = var.tag_environment
@@ -98,7 +98,7 @@ module "flag_service_rds" {
 # targeting-service Database
 # =============================================================================
 module "targeting_service_rds" {
-  source = "github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds?ref=5c6fa8000f697b76747c2a4c35680a08991b27be"
+  source = "github.com/brianmonteiro54/terraform-aws-rds-database//modules/rds?ref=9d7ccbecaddaaf20a2deb5112432f5f44864f0a3"
 
   db_identifier = var.db_identifier_targeting
   environment   = var.tag_environment

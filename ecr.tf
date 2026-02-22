@@ -3,7 +3,7 @@
 # =============================================================================
 
 module "auth_service_ecr" {
-  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=446bd6c6d9edefa5fa844c32b1dffc2efec14bfe"
+  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=cd3e5888aea1635f027fee81c0620d21a48ca7a1"
 
   # --- Identificação ---
   repository_name        = "auth-service"
@@ -34,7 +34,7 @@ module "auth_service_ecr" {
 }
 
 module "flag_service_ecr" {
-  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=446bd6c6d9edefa5fa844c32b1dffc2efec14bfe"
+  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=cd3e5888aea1635f027fee81c0620d21a48ca7a1"
 
   # --- Identificação ---
   repository_name        = "flag-service"
@@ -65,7 +65,7 @@ module "flag_service_ecr" {
 }
 
 module "targeting_service_ecr" {
-  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=446bd6c6d9edefa5fa844c32b1dffc2efec14bfe"
+  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=cd3e5888aea1635f027fee81c0620d21a48ca7a1"
 
   # --- Identificação ---
   repository_name        = "targeting-service"
@@ -96,7 +96,7 @@ module "targeting_service_ecr" {
 }
 
 module "evaluation_service_ecr" {
-  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=446bd6c6d9edefa5fa844c32b1dffc2efec14bfe"
+  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=cd3e5888aea1635f027fee81c0620d21a48ca7a1"
 
   # --- Identificação ---
   repository_name        = "evaluation-service"
@@ -127,7 +127,7 @@ module "evaluation_service_ecr" {
 }
 
 module "analytics_service_ecr" {
-  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=446bd6c6d9edefa5fa844c32b1dffc2efec14bfe"
+  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=cd3e5888aea1635f027fee81c0620d21a48ca7a1"
 
   # --- Identificação ---
   repository_name        = "analytics-service"
