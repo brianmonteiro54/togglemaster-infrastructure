@@ -3,7 +3,7 @@
 # =============================================================================
 
 module "dynamodb_analytics" {
-  source = "github.com/brianmonteiro54/terraform-aws-dynamodb//modules/dynamodb?ref=a6c709e9341f1e0ac0a1d4a4455242779870b574"
+  source = "github.com/brianmonteiro54/terraform-aws-dynamodb//modules/dynamodb?ref=8a55060136580d55f3953de4116ce485ca9e1b11"
 
   # --- Required Variables ---
   table_name  = var.dynamodb_table_name

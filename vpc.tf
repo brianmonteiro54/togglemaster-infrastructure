@@ -2,7 +2,7 @@ module "vpc" {
   # checkov:skip=CKV_AWS_130:Public subnets intentionally map public IPs for ingress
   # checkov:skip=CKV2_AWS_11:VPC Flow Logs are managed or skipped for this environment
   # checkov:skip=CKV2_AWS_12:Default SG is restricted by AWS provider or manual config
-  source = "github.com/brianmonteiro54/terraform-aws-vpc-network//modules/vpc?ref=a59e606347482c7fcd1428eebdd00620a649b380"
+  source = "github.com/brianmonteiro54/terraform-aws-vpc-network//modules/vpc?ref=1185cd978b63dae90bac2097c666f3fe45e64f61"
 
 
 

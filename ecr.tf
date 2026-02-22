@@ -4,7 +4,7 @@
 
 module "ecr_auth_service" {
   # checkov:skip=CKV_AWS_163:canning is disable in tfvars scanner
-  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=cd3e5888aea1635f027fee81c0620d21a48ca7a1"
+  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=2c4973a14fc5d908e6d9c534d46a453a18d29206"
 
   # --- Identificação ---
   repository_name        = "auth-service"
@@ -36,7 +36,7 @@ module "ecr_auth_service" {
 
 module "ecr_flag_service" {
   # checkov:skip=CKV_AWS_163:canning is disable in tfvars scanner
-  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=cd3e5888aea1635f027fee81c0620d21a48ca7a1"
+  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=2c4973a14fc5d908e6d9c534d46a453a18d29206"
 
   # --- Identificação ---
   repository_name        = "flag-service"
@@ -68,7 +68,7 @@ module "ecr_flag_service" {
 
 module "ecr_targeting_service" {
   # checkov:skip=CKV_AWS_163:canning is disable in tfvars scanner
-  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=cd3e5888aea1635f027fee81c0620d21a48ca7a1"
+  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=2c4973a14fc5d908e6d9c534d46a453a18d29206"
 
   # --- Identificação ---
   repository_name        = "targeting-service"
@@ -100,7 +100,7 @@ module "ecr_targeting_service" {
 
 module "ecr_evaluation_service" {
   # checkov:skip=CKV_AWS_163:canning is disable in tfvars scanner
-  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=cd3e5888aea1635f027fee81c0620d21a48ca7a1"
+  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=2c4973a14fc5d908e6d9c534d46a453a18d29206"
 
   # --- Identificação ---
   repository_name        = "evaluation-service"
@@ -132,7 +132,7 @@ module "ecr_evaluation_service" {
 
 module "ecr_analytics_service" {
   # checkov:skip=CKV_AWS_163:canning is disable in tfvars scanner
-  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=cd3e5888aea1635f027fee81c0620d21a48ca7a1"
+  source = "github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr?ref=2c4973a14fc5d908e6d9c534d46a453a18d29206"
 
   # --- Identificação ---
   repository_name        = "analytics-service"

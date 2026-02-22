@@ -5,32 +5,31 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Ambiente alvo para destroy'
+        description: 'Ambiente alvo'
         required: true
         type: choice
         options:
           - dev
           - prod
       confirm_env:
-        description: 'Digite o nome do ambiente para confirmar (ex: dev ou prod)'
+        description: 'Digite o nome do ambiente para confirmar'
         required: true
         type: string
       reason:
-        description: 'Justificativa para o destroy (obrigatório)'
+        description: 'Justificativa (obrigatório)'
         required: true
         type: string
       target_resources:
-        description: 'Recursos específicos (-target). Vazio = destroy completo. Ex: aws_instance.web,aws_s3_bucket.data'
+        description: 'Recursos específicos (-target). Vazio = destroy completo.'
         required: false
         type: string
         default: ''
       skip_state_backup:
-        description: 'Pular backup do state? (NÃO recomendado)'
+        description: 'Pular backup do state?'
         required: false
         type: boolean
         default: false
 
-# Garante que apenas 1 destroy por ambiente rode simultaneamente.
 concurrency:
   group: destroy-${{ github.event.inputs.environment }}
   cancel-in-progress: false
@@ -38,15 +37,9 @@ concurrency:
 permissions:
   contents: read
 
-env:
-  TERRAFORM_VERSION: '1.10.5'
-  AWS_REGION: 'us-east-1'
-
-# =============================================================================
-# Job 1: Validate & Confirm
-# =============================================================================
 jobs:
-  validate:
+  # ── Validação de inputs localmente ──
+  validate-inputs:
     name: Validate Inputs
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -54,516 +47,42 @@ jobs:
       env_name: ${{ steps.validate.outputs.env_name }}
       tfvars_path: ${{ steps.validate.outputs.tfvars_path }}
       backend_path: ${{ steps.validate.outputs.backend_path }}
-      has_targets: ${{ steps.validate.outputs.has_targets }}
-      targets_flag: ${{ steps.validate.outputs.targets_flag }}
 
     steps:
       - name: Confirm environment match
         id: validate
         run: |
-          ENV="${{ inputs.environment }}"
-          CONFIRM="${{ inputs.confirm_env }}"
-
-          # ── Double-check: o nome digitado deve bater com a seleção ──
-          if [[ "$ENV" != "$CONFIRM" ]]; then
-            echo "::error::Confirmação falhou: selecionou '$ENV' mas digitou '$CONFIRM'."
-            echo "::error::Digite exatamente o nome do ambiente para confirmar o destroy."
+          if [[ "${{ inputs.environment }}" != "${{ inputs.confirm_env }}" ]]; then
+            echo "::error::Confirmação falhou: selecionou '${{ inputs.environment }}' mas digitou '${{ inputs.confirm_env }}'."
             exit 1
           fi
-
-          # ── Justificativa obrigatória ──
           if [[ -z "${{ inputs.reason }}" ]]; then
-            echo "::error::Justificativa é obrigatória para destroy."
+            echo "::error::Justificativa é obrigatória."
             exit 1
           fi
-
-          # ── Monta target flags se especificados ──
-          HAS_TARGETS="false"
-          TARGETS_FLAG=""
-          if [[ -n "${{ inputs.target_resources }}" ]]; then
-            HAS_TARGETS="true"
-            IFS=',' read -ra RESOURCES <<< "${{ inputs.target_resources }}"
-            for res in "${RESOURCES[@]}"; do
-              res=$(echo "$res" | xargs)  # trim whitespace
-              TARGETS_FLAG="${TARGETS_FLAG} -target=${res}"
-            done
-          fi
-
+          ENV="${{ inputs.environment }}"
           {
             echo "env_name=$ENV"
             echo "tfvars_path=envs/${ENV}/terraform.tfvars"
             echo "backend_path=envs/${ENV}/backend.hcl"
-            echo "has_targets=$HAS_TARGETS"
-            echo "targets_flag=$TARGETS_FLAG"
           } >> "$GITHUB_OUTPUT"
 
-          echo "══════════════════════════════════════════════════"
-          echo "  🗑️  TERRAFORM DESTROY — VALIDAÇÃO"
-          echo "══════════════════════════════════════════════════"
-          echo "  Ambiente   : $ENV"
-          echo "  Solicitante: ${{ github.actor }}"
-          echo "  Razão      : ${{ inputs.reason }}"
-          echo "  Targets    : ${{ inputs.target_resources || 'TODOS (destroy completo)' }}"
-          echo "══════════════════════════════════════════════════"
-
-      # ── Proteção extra para prod ──
       - name: Production safety check
         if: inputs.environment == 'prod'
-        run: |
-          echo "::warning::⚠️ ATENÇÃO: Destroy solicitado em PRODUÇÃO por ${{ github.actor }}"
-          echo "::warning::Razão: ${{ inputs.reason }}"
-          echo ""
-          echo "O destroy em prod requer aprovação via Environment Gate."
-          echo "Certifique-se de que TODOS os stakeholders foram notificados."
+        run: echo "::warning::⚠️ DESTROY em PRODUÇÃO solicitado por ${{ github.actor }}"
 
-# =============================================================================
-# Job 2: Destroy Plan (mostra o que será destruído ANTES de executar)
-# =============================================================================
-  destroy-plan:
-    name: Destroy Plan (${{ needs.validate.outputs.env_name }})
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    needs: validate
-    outputs:
-      has_changes: ${{ steps.plan.outputs.has_changes }}
-      plan_summary: ${{ steps.stats.outputs.summary }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Verify AWS identity
-        run: |
-          IDENTITY=$(aws sts get-caller-identity --output json)
-          echo "AWS Identity: $(echo "$IDENTITY" | jq -r '.Arn')"
-          echo "Account: $(echo "$IDENTITY" | jq -r '.Account')"
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ env.TERRAFORM_VERSION }}
-          terraform_wrapper: false
-
-      - name: Cache Terraform providers
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.terraform.d/plugin-cache
-            **/.terraform/providers
-          key: tf-providers-${{ runner.os }}-${{ hashFiles('**/.terraform.lock.hcl') }}
-          restore-keys: tf-providers-${{ runner.os }}-
-
-      - name: Configure Terraform plugin cache
-        run: |
-          mkdir -p ~/.terraform.d/plugin-cache
-          echo 'plugin_cache_dir = "$HOME/.terraform.d/plugin-cache"' > ~/.terraformrc
-
-      - name: Terraform Init
-        run: |
-          terraform init \
-            -backend-config="${{ needs.validate.outputs.backend_path }}" \
-            -reconfigure \
-            -input=false \
-            -no-color
-
-      - name: Terraform Destroy Plan
-        id: plan
-        run: |
-          set +e
-
-          terraform plan \
-            -destroy \
-            -var-file="${{ needs.validate.outputs.tfvars_path }}" \
-            ${{ needs.validate.outputs.targets_flag }} \
-            -out=tfplan-destroy \
-            -detailed-exitcode \
-            -input=false \
-            -no-color 2>&1 | tee destroy_plan_output.txt
-
-          EXIT_CODE=${PIPESTATUS[0]}
-
-          case $EXIT_CODE in
-            0)
-              echo "ℹ️  Nada para destruir em '${{ needs.validate.outputs.env_name }}'."
-              echo "has_changes=false" >> "$GITHUB_OUTPUT"
-              ;;
-            1)
-              echo "::error::Terraform destroy plan falhou."
-              echo "has_changes=false" >> "$GITHUB_OUTPUT"
-              exit 1
-              ;;
-            2)
-              echo "⚠️  Destroy plan gerado — recursos serão DESTRUÍDOS após aprovação."
-              echo "has_changes=true" >> "$GITHUB_OUTPUT"
-              ;;
-          esac
-
-      - name: Extract plan statistics
-        id: stats
-        if: always()
-        run: |
-          if [[ ! -f destroy_plan_output.txt ]]; then
-            echo "summary=Plan falhou antes de gerar output" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          DESTROYED=$(grep -oP '\d+(?= to destroy)' destroy_plan_output.txt | tail -1 || echo 0)
-          ADDED=$(grep -oP '\d+(?= to add)'          destroy_plan_output.txt | tail -1 || echo 0)
-          CHANGED=$(grep -oP '\d+(?= to change)'     destroy_plan_output.txt | tail -1 || echo 0)
-
-          echo "summary=+${ADDED:-0} ~${CHANGED:-0} -${DESTROYED:-0}" >> "$GITHUB_OUTPUT"
-
-      - name: Destroy plan summary
-        if: always()
-        run: |
-          ENV="${{ needs.validate.outputs.env_name }}"
-          {
-            echo "### 🗑️ Terraform Destroy Plan — \`${ENV}\`"
-            echo ""
-            echo "> **Solicitante:** \`${{ github.actor }}\`"
-            echo "> **Razão:** ${{ inputs.reason }}"
-            [[ -n "${{ inputs.target_resources }}" ]] && echo "> **Targets:** \`${{ inputs.target_resources }}\`"
-            echo ""
-
-            if [[ -f destroy_plan_output.txt ]]; then
-              DESTROYED=$(grep -oP '\d+(?= to destroy)' destroy_plan_output.txt | tail -1 || echo 0)
-
-              echo "| Ação | Quantidade |"
-              echo "|------|-----------|"
-              echo "| 🔴 Destroy | **${DESTROYED:-0}** |"
-              echo ""
-
-              if [[ "${DESTROYED:-0}" -gt 0 ]]; then
-                echo "⚠️ **${DESTROYED} recurso(s) serão permanentemente destruídos!**"
-                echo ""
-              fi
-
-              echo "<details><summary>Ver plano completo</summary>"
-              echo ""
-              echo '```hcl'
-              cat destroy_plan_output.txt
-              echo '```'
-              echo "</details>"
-            else
-              echo "❌ **Destroy plan falhou** — nenhum output gerado."
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Upload destroy plan artifact
-        if: steps.plan.outputs.has_changes == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: tfplan-destroy-${{ needs.validate.outputs.env_name }}-${{ github.sha }}
-          path: |
-            tfplan-destroy
-            destroy_plan_output.txt
-          retention-days: 1
-
-# =============================================================================
-# Job 3: Terraform Destroy (bloqueado por Environment Gate)
-# =============================================================================
+  # ── Chama pipeline central ──
   destroy:
-    name: Destroy (${{ needs.validate.outputs.env_name }})
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    needs: [validate, destroy-plan]
-    if: needs.destroy-plan.outputs.has_changes == 'true'
-
-    # Environment Gate — requer aprovação manual no GitHub UI
-    # Configure: Settings → Environments → destroy-dev / destroy-prod
-    # Recomendação: exija 2+ aprovadores para destroy-prod
-    environment: destroy-${{ needs.validate.outputs.env_name }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Verify AWS identity
-        run: |
-          IDENTITY=$(aws sts get-caller-identity --output json)
-          echo "AWS Identity: $(echo "$IDENTITY" | jq -r '.Arn')"
-          echo "Account: $(echo "$IDENTITY" | jq -r '.Account')"
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ env.TERRAFORM_VERSION }}
-          terraform_wrapper: false
-
-      - name: Cache Terraform providers
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.terraform.d/plugin-cache
-            **/.terraform/providers
-          key: tf-providers-${{ runner.os }}-${{ hashFiles('**/.terraform.lock.hcl') }}
-          restore-keys: tf-providers-${{ runner.os }}-
-
-      - name: Configure Terraform plugin cache
-        run: |
-          mkdir -p ~/.terraform.d/plugin-cache
-          echo 'plugin_cache_dir = "$HOME/.terraform.d/plugin-cache"' > ~/.terraformrc
-
-      - name: Terraform Init
-        run: |
-          terraform init \
-            -backend-config="${{ needs.validate.outputs.backend_path }}" \
-            -reconfigure \
-            -input=false \
-            -no-color
-
-      # ── State backup ANTES do destroy ──
-      - name: Backup current state
-        id: backup
-        if: inputs.skip_state_backup == false
-        run: |
-          BACKUP_FILE="state-pre-destroy-${{ needs.validate.outputs.env_name }}-$(date -u '+%Y%m%d-%H%M%S').json"
-          terraform state pull > "$BACKUP_FILE" 2>/dev/null || true
-
-          if [[ -s "$BACKUP_FILE" ]]; then
-            echo "✅ State backup salvo: $BACKUP_FILE ($(wc -c < "$BACKUP_FILE") bytes)"
-            echo "backup_file=$BACKUP_FILE" >> "$GITHUB_OUTPUT"
-          else
-            echo "⚠️ State vazio ou inacessível."
-            echo "backup_file=" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Upload state backup
-        if: inputs.skip_state_backup == false && steps.backup.outputs.backup_file != ''
-        uses: actions/upload-artifact@v4
-        with:
-          name: state-pre-destroy-${{ needs.validate.outputs.env_name }}-${{ github.sha }}
-          path: ${{ steps.backup.outputs.backup_file }}
-          retention-days: 90
-
-      - name: Download destroy plan artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: tfplan-destroy-${{ needs.validate.outputs.env_name }}-${{ github.sha }}
-
-      - name: Terraform Destroy
-        id: destroy
-        run: |
-          ENV="${{ needs.validate.outputs.env_name }}"
-          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
-
-          echo "══════════════════════════════════════════════════"
-          echo "  🗑️  TERRAFORM DESTROY"
-          echo "══════════════════════════════════════════════════"
-          echo "  Ambiente   : $ENV"
-          echo "  Aprovado   : ${{ github.actor }}"
-          echo "  Commit     : ${{ github.sha }}"
-          echo "  Timestamp  : $TIMESTAMP"
-          echo "  Razão      : ${{ inputs.reason }}"
-          echo "  Targets    : ${{ inputs.target_resources || 'TODOS' }}"
-          echo "══════════════════════════════════════════════════"
-
-          set +e
-          terraform apply \
-            -auto-approve \
-            -input=false \
-            -no-color \
-            tfplan-destroy 2>&1 | tee destroy_output.txt
-
-          EXIT_CODE=${PIPESTATUS[0]}
-          echo "exitcode=$EXIT_CODE" >> "$GITHUB_OUTPUT"
-
-          if [[ "$EXIT_CODE" != "0" ]]; then
-            echo "::error::Terraform destroy falhou com exit code $EXIT_CODE"
-            echo "::error::ATENÇÃO: Destroy pode ter sido parcial. Verifique o state!"
-            exit 1
-          fi
-
-      - name: Destroy summary
-        if: always()
-        run: |
-          EXIT="${{ steps.destroy.outputs.exitcode }}"
-          STATUS=$([[ "$EXIT" == "0" ]] && echo "✅ Destroy concluído" || echo "❌ Destroy falhou (exit=$EXIT)")
-
-          {
-            echo "### 🗑️ Terraform Destroy — \`${{ needs.validate.outputs.env_name }}\`"
-            echo ""
-            echo "**Status: $STATUS**"
-            echo ""
-            echo "| Campo | Valor |"
-            echo "|-------|-------|"
-            echo "| **Ambiente**     | \`${{ needs.validate.outputs.env_name }}\` |"
-            echo "| **Aprovado por** | \`${{ github.actor }}\` |"
-            echo "| **Commit**       | \`${{ github.sha }}\` |"
-            echo "| **Timestamp**    | $(date -u '+%Y-%m-%d %H:%M:%S UTC') |"
-            echo "| **Razão**        | ${{ inputs.reason }} |"
-            echo "| **Targets**      | \`${{ inputs.target_resources || 'TODOS' }}\` |"
-            echo ""
-
-            if [[ -f destroy_output.txt ]]; then
-              echo "<details><summary>Ver output completo</summary>"
-              echo ""
-              echo '```'
-              cat destroy_output.txt
-              echo '```'
-              echo "</details>"
-            fi
-
-            if [[ "$EXIT" != "0" ]]; then
-              echo ""
-              echo "---"
-              echo "⚠️ **Destroy falhou — possível estado parcial!**"
-              echo ""
-              echo "1. Verifique o state: \`terraform state list\`"
-              echo "2. Use o backup (artefato \`state-pre-destroy-*\`) se necessário"
-              echo "3. **Não** re-execute sem verificar o estado atual"
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Upload destroy output
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: destroy-output-${{ needs.validate.outputs.env_name }}-${{ github.sha }}
-          path: destroy_output.txt
-          retention-days: 90
-
-# =============================================================================
-# Job 4: Post-Destroy Verification
-# =============================================================================
-  verify:
-    name: Verify (${{ needs.validate.outputs.env_name }})
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs: [validate, destroy]
-    if: always() && needs.destroy.result == 'success'
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ env.TERRAFORM_VERSION }}
-          terraform_wrapper: false
-
-      - name: Configure Terraform plugin cache
-        run: |
-          mkdir -p ~/.terraform.d/plugin-cache
-          echo 'plugin_cache_dir = "$HOME/.terraform.d/plugin-cache"' > ~/.terraformrc
-
-      - name: Terraform Init
-        run: |
-          terraform init \
-            -backend-config="${{ needs.validate.outputs.backend_path }}" \
-            -reconfigure \
-            -input=false \
-            -no-color
-
-      - name: Verify state is clean
-        id: verify
-        run: |
-          RESOURCES=$(terraform state list 2>/dev/null | wc -l)
-
-          if [[ "$RESOURCES" -eq 0 ]]; then
-            echo "✅ State vazio — todos os recursos foram destruídos."
-            echo "clean=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::warning::⚠️ Ainda existem $RESOURCES recurso(s) no state!"
-            terraform state list
-            echo "clean=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Verification summary
-        if: always()
-        run: |
-          CLEAN="${{ steps.verify.outputs.clean }}"
-          STATUS=$([[ "$CLEAN" == "true" ]] && echo "✅ State vazio" || echo "⚠️ Recursos restantes no state")
-
-          {
-            echo "### 🔎 Post-Destroy Verification — \`${{ needs.validate.outputs.env_name }}\`"
-            echo ""
-            echo "**Status:** $STATUS"
-
-            if [[ "$CLEAN" != "true" ]]; then
-              echo ""
-              echo "Recursos restantes podem indicar:"
-              echo "- Destroy com \`-target\` (parcial intencional)"
-              echo "- Falha parcial no destroy"
-              echo "- Recursos com \`prevent_destroy = true\`"
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
-
-# =============================================================================
-# Job 5: Notification (falhas)
-# =============================================================================
-  notify-failure:
-    name: Notify Failure
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    needs: [validate, destroy-plan, destroy]
-    if: always() && (needs.destroy-plan.result == 'failure' || needs.destroy.result == 'failure')
-
-    steps:
-      - name: Send failure notification
-        run: |
-          ENV="${{ needs.validate.outputs.env_name }}"
-          FAILED_JOB=$([[ "${{ needs.destroy-plan.result }}" == "failure" ]] && echo "destroy-plan" || echo "destroy")
-          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-
-          echo "::error::Destroy falhou no job '$FAILED_JOB' para ambiente '$ENV'"
-          echo "::error::Razão original: ${{ inputs.reason }}"
-
-          # ── Slack webhook ──
-          # if [[ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]]; then
-          #   curl -sf -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
-          #     -H 'Content-Type: application/json' \
-          #     -d "{
-          #       \"blocks\": [
-          #         {
-          #           \"type\": \"section\",
-          #           \"text\": {
-          #             \"type\": \"mrkdwn\",
-          #             \"text\": \"🚨 *Destroy falhou* em \`${ENV}\`\n*Job:* ${FAILED_JOB}\n*Razão:* ${{ inputs.reason }}\n*Actor:* ${{ github.actor }}\n<${RUN_URL}|Ver logs>\"
-          #           }
-          #         }
-          #       ]
-          #     }" || echo "::warning::Falha ao enviar notificação Slack"
-          # fi
-
-      - name: Failure summary
-        run: |
-          {
-            echo "### 🚨 Destroy Failed — \`${{ needs.validate.outputs.env_name }}\`"
-            echo ""
-            echo "| Job | Resultado |"
-            echo "|-----|-----------|"
-            echo "| Destroy Plan | \`${{ needs.destroy-plan.result }}\` |"
-            echo "| Destroy      | \`${{ needs.destroy.result }}\` |"
-            echo ""
-            echo "**⚠️ ATENÇÃO:** Se o destroy falhou parcialmente, o state pode estar inconsistente."
-            echo ""
-            echo "1. Verifique o state: \`terraform state list\`"
-            echo "2. Use o backup (artefato \`state-pre-destroy-*\`) para rollback se necessário"
-            echo "3. **Nunca** re-execute destroy sem verificar o estado atual primeiro"
-          } >> "$GITHUB_STEP_SUMMARY"
+    needs: validate-inputs
+    uses: brianmonteiro54/devops-template/.github/workflows/terraform-destroy.yml@v2.0.0
+    with:
+      env-name: ${{ needs.validate-inputs.outputs.env_name }}
+      tfvars-path: ${{ needs.validate-inputs.outputs.tfvars_path }}
+      backend-path: ${{ needs.validate-inputs.outputs.backend_path }}
+      reason: ${{ inputs.reason }}
+      target-resources: ${{ inputs.target_resources }}
+      skip-state-backup: ${{ inputs.skip_state_backup }}
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}

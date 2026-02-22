@@ -1,6 +1,6 @@
 module "redis" {
   # checkov:skip=CKV_AWS_29:Encryption at rest is enabled via variable in tfvars
-  source = "github.com/brianmonteiro54/terraform-aws-redis-elasticache//modules/redis?ref=2e27d5725a41eb0a2681e49b5361c5a8cef8f024"
+  source = "github.com/brianmonteiro54/terraform-aws-redis-elasticache//modules/redis?ref=f0f4e72d72b8f44d1ffec64df7fb096cf1de8ba8"
 
   replication_group_id = "togglemaster-redis"
   environment          = var.tag_environment
