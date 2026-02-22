@@ -3,7 +3,7 @@
 # =============================================================================
 
 module "sqs_events" {
-  source = "github.com/brianmonteiro54/terraform-aws-sqs//modules/sqs?ref=50d474433c8aa3e3839a5a97a7fe57289c1aec1b"
+  source = "github.com/brianmonteiro54/terraform-aws-sqs//modules/sqs?ref=474eeb54ac7af491c1d921a6d78746cf920647c2"
 
   # --- Identificação ---
   queue_name  = var.sqs_queue_name

@@ -4,7 +4,7 @@
 
 module "pritunl_vpn" {
   # checkov:skip=CKV2_AWS_5:Security Group is attached to the instance within the module logic
-  source = "github.com/brianmonteiro54/terraform-aws-ec2//modules/ec2?ref=a4533e1bfecbaab8e192529e12e626ef88da61de"
+  source = "github.com/brianmonteiro54/terraform-aws-ec2//modules/ec2?ref=17c9a7d61d695ae4fa4033e091c2744377e583ac"
 
   # --- Identificação ---
   instance_name = var.instance_name
