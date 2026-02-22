@@ -88,7 +88,6 @@ jobs:
       - name: Terraform Format
         id: fmt
         run: terraform fmt -check -recursive -diff
-        continue-on-error: true
 
       - name: TFLint
         id: tflint
@@ -99,7 +98,6 @@ jobs:
             --recursive \
             --force 2>&1 | tee tflint_output.txt
           echo "exitcode=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
-        continue-on-error: true
 
       - name: Comment PR — Lint & Format
         if: github.event_name == 'pull_request'
@@ -670,7 +668,6 @@ jobs:
           output-file: README.md
           output-method: inject
           git-push: true
-        continue-on-error: true
 
 # =============================================================================
 # Job 6: CI Gate — portão bloqueante final
