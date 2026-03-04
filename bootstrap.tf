@@ -14,7 +14,12 @@ locals {
 
 # ── Módulo Bootstrap ─────────────────────────────────────────────────────────
 module "ec2_bootstrap" {
-  source = "github.com/brianmonteiro54/terraform-aws-eks-bootstrap//modules/bootstrap?ref=23c2c966bcfaabc0ff34411758c76d1fa038b97c"
+  source = "github.com/brianmonteiro54/terraform-aws-eks-bootstrap//modules/bootstrap?ref=0cc55a105d6e474fc569d2cb37d0d980da48a311"
+
+  # ArgoCD no Ingress
+  argocd_ingress_enabled = true
+  argocd_ingress_host    = "toggle.pt"
+  argocd_ingress_path    = "/argocd"
 
   # Cluster
   cluster_name                  = module.eks.cluster_name
