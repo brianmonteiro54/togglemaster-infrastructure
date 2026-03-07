@@ -131,7 +131,7 @@ nodegroups = {
     capacity_type   = "ON_DEMAND"
     instance_types  = []
     version         = "1.34"
-    release_version = "1.34.3-20260209"
+    release_version = "1.34.4-20260224"
     labels          = {}
     tags            = {}
   }
@@ -143,7 +143,7 @@ nodegroups = {
     capacity_type   = "ON_DEMAND"
     instance_types  = []
     version         = "1.34"
-    release_version = "1.34.3-20260209"
+    release_version = "1.34.4-20260224"
     labels          = {}
     tags            = {}
   }
@@ -227,7 +227,7 @@ addons = {
     tags                     = {}
   }
   kube-proxy = {
-    addon_version            = "v1.34.3-eksbuild.2"
+    addon_version            = "v1.34.3-eksbuild.5"
     configuration_values     = null
     resolve_conflicts        = "OVERWRITE"
     service_account_role_arn = null
