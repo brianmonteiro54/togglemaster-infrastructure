@@ -27,13 +27,30 @@ Após o `terraform apply`, a VPN (Pritunl) pode ser destruída para economizar r
 terraform init
 ```
 
-### 2. Provisionar a infraestrutura
+### 2. Configurar Credenciais no `bootstrap.tf` (Obrigatório ⚠️)
+
+Nesta branch, o módulo de bootstrap precisa de credenciais diretas para gerenciar recursos dentro do cluster (como Helm charts e manifestos).
+
+Abra o arquivo `bootstrap.tf` está definido e substitua os placeholders pelas suas credenciais atuais da AWS:
+
+```hcl
+  aws_credentials = <<-EOT
+[default]
+aws_access_key_id=COLE_SUA_ACCESS_KEY_AQUI
+aws_secret_access_key=COLE_SUA_SECRET_ACCESS_KEY
+aws_session_token=COLE_SEU_SESSION_TOKEN_AQUI
+  EOT
+```
+
+> ⚠️ **Atenção:** Nunca versione este arquivo com as chaves reais preenchidas em repositórios públicos.
+
+### 3. Provisionar a infraestrutura
 
 ```bash
 terraform apply
 ```
 
-### 3. Configurar o `kubectl`
+### 4. Configurar o `kubectl`
 
 Como o endpoint é público, basta rodar:
 
@@ -47,7 +64,7 @@ Validar a conexão:
 kubectl get nodes
 ```
 
-### 4. Destruir a VPN (opcional — economia de recursos)
+### 5. Destruir a VPN (opcional — economia de recursos)
 
 A VPN não é necessária nesta branch porque o endpoint do EKS é público.
 Após confirmar que o `kubectl` está funcionando:
