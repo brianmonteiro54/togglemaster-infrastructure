@@ -85,7 +85,7 @@ jobs:
   # ── Chama pipeline central ──
   deploy:
     needs: resolve-env
-    uses: brianmonteiro54/devops-template/.github/workflows/terraform-cd.yml@v2.0.0
+    uses: brianmonteiro54/devops-template/.github/workflows/terraform-cd.yml@v2.1.0
     with:
       env-name: ${{ needs.resolve-env.outputs.env_name }}
       tfvars-path: ${{ needs.resolve-env.outputs.tfvars_path }}

@@ -7,6 +7,17 @@
 
 ---
 
+## ⚠️ Nota sobre credenciais
+
+Este projeto utiliza AWS Academy, que impõe restrições na criação de
+IAM Roles e Identity Providers. Por isso, as credenciais AWS são
+passadas via secrets do GitHub Actions e injetadas na EC2 de bootstrap.
+
+Em um ambiente de produção real, a abordagem correta seria:
+- **GitHub Actions → AWS**: OIDC Federation (sem access keys)
+- **EC2 Bootstrap → EKS**: IAM Instance Profile com role dedicada
+- **Pods → AWS**: IRSA (IAM Roles for Service Accounts)
+
 ## 📋 Índice
 
 - [Visão Geral](#-visão-geral)
@@ -111,6 +122,7 @@ Este projeto consome **módulos reutilizáveis** versionados via Git refs:
 | `sqs` | [terraform-aws-sqs](https://github.com/brianmonteiro54/terraform-aws-sqs) | Filas SQS com DLQ e dashboards |
 | `ecr` | [terraform-aws-ecr](https://github.com/brianmonteiro54/terraform-aws-ecr) | Repositórios ECR com lifecycle policies |
 | `ec2` | [terraform-aws-ec2](https://github.com/brianmonteiro54/terraform-aws-ec2) | Instâncias EC2 com SG, EIP e monitoramento |
+| `bootstrap` | [terraform-aws-eks-bootstrap](https://github.com/brianmonteiro54/terraform-aws-eks-bootstrap) | Instâncias EC2 temporária dentro da VPC do EKS para executar o setup inicial do cluster |
 
 ---
 

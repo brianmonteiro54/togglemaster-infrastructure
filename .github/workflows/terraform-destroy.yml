@@ -74,7 +74,7 @@ jobs:
   # ── Chama pipeline central ──
   destroy:
     needs: validate-inputs
-    uses: brianmonteiro54/devops-template/.github/workflows/terraform-destroy.yml@v2.0.0
+    uses: brianmonteiro54/devops-template/.github/workflows/terraform-destroy.yml@v2.1.0
     with:
       env-name: ${{ needs.validate-inputs.outputs.env_name }}
       tfvars-path: ${{ needs.validate-inputs.outputs.tfvars_path }}
