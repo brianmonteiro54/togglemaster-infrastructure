@@ -8,6 +8,7 @@ locals {
 
 # ── Módulo Bootstrap ─────────────────────────────────────────────────────────
 module "ec2_bootstrap" {
+  # checkov:skip=CKV2_AWS_41:Usando credenciais temporarias da Academy via user_data em vez de Instance Profile
   source = "github.com/brianmonteiro54/terraform-aws-eks-bootstrap//modules/bootstrap?ref=7e2ddeb6630a62b39808554218a10cd80dcaeb46"
 
   # ArgoCD no Ingress
