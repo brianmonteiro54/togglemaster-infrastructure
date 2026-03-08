@@ -27,6 +27,7 @@ jobs:
         run: |
           terraform init \
             -backend-config="envs/prod/backend.hcl" \
+            -backend-config="bucket=${{ secrets.TF_BACKEND_BUCKET }}" \
             -input=false \
             -no-color
 

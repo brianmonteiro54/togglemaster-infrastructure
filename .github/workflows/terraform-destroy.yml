@@ -74,7 +74,7 @@ jobs:
   # ── Chama pipeline central ──
   destroy:
     needs: validate-inputs
-    uses: brianmonteiro54/devops-template/.github/workflows/terraform-destroy.yml@v2.0.0
+    uses: brianmonteiro54/devops-template/.github/workflows/terraform-destroy.yml@v2.1.0
     with:
       env-name: ${{ needs.validate-inputs.outputs.env_name }}
       tfvars-path: ${{ needs.validate-inputs.outputs.tfvars_path }}
@@ -86,3 +86,4 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+      TF_BACKEND_BUCKET: ${{ secrets.TF_BACKEND_BUCKET }}

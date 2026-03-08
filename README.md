@@ -7,6 +7,17 @@
 
 ---
 
+## ⚠️ Nota sobre credenciais
+
+Este projeto utiliza AWS Academy, que impõe restrições na criação de
+IAM Roles e Identity Providers. Por isso, as credenciais AWS são
+passadas via secrets do GitHub Actions e injetadas na EC2 de bootstrap.
+
+Em um ambiente de produção real, a abordagem correta seria:
+- **GitHub Actions → AWS**: OIDC Federation (sem access keys)
+- **EC2 Bootstrap → EKS**: IAM Instance Profile com role dedicada
+- **Pods → AWS**: IRSA (IAM Roles for Service Accounts)
+
 ## 📋 Índice
 
 - [Visão Geral](#-visão-geral)
@@ -111,6 +122,7 @@ Este projeto consome **módulos reutilizáveis** versionados via Git refs:
 | `sqs` | [terraform-aws-sqs](https://github.com/brianmonteiro54/terraform-aws-sqs) | Filas SQS com DLQ e dashboards |
 | `ecr` | [terraform-aws-ecr](https://github.com/brianmonteiro54/terraform-aws-ecr) | Repositórios ECR com lifecycle policies |
 | `ec2` | [terraform-aws-ec2](https://github.com/brianmonteiro54/terraform-aws-ec2) | Instâncias EC2 com SG, EIP e monitoramento |
+| `bootstrap` | [terraform-aws-eks-bootstrap](https://github.com/brianmonteiro54/terraform-aws-eks-bootstrap) | Instâncias EC2 temporária dentro da VPC do EKS para executar o setup inicial do cluster |
 
 ---
 
@@ -297,6 +309,7 @@ A seção abaixo é **automaticamente populada** pelo [terraform-docs](https://t
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_dynamodb_analytics"></a> [dynamodb\_analytics](#module\_dynamodb\_analytics) | github.com/brianmonteiro54/terraform-aws-dynamodb//modules/dynamodb | 8a55060136580d55f3953de4116ce485ca9e1b11 |
+| <a name="module_ec2_bootstrap"></a> [ec2\_bootstrap](#module\_ec2\_bootstrap) | github.com/brianmonteiro54/terraform-aws-eks-bootstrap//modules/bootstrap | 7e2ddeb6630a62b39808554218a10cd80dcaeb46 |
 | <a name="module_ecr_analytics_service"></a> [ecr\_analytics\_service](#module\_ecr\_analytics\_service) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | 2c4973a14fc5d908e6d9c534d46a453a18d29206 |
 | <a name="module_ecr_auth_service"></a> [ecr\_auth\_service](#module\_ecr\_auth\_service) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | 2c4973a14fc5d908e6d9c534d46a453a18d29206 |
 | <a name="module_ecr_evaluation_service"></a> [ecr\_evaluation\_service](#module\_ecr\_evaluation\_service) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | 2c4973a14fc5d908e6d9c534d46a453a18d29206 |
@@ -332,6 +345,9 @@ A seção abaixo é **automaticamente populada** pelo [terraform-docs](https://t
 | <a name="input_ami_id"></a> [ami\_id](#input\_ami\_id) | AMI ID used for the EC2 instance. | `string` | n/a | yes |
 | <a name="input_auth_token"></a> [auth\_token](#input\_auth\_token) | Redis AUTH token (min 16 chars, max 128 chars) | `string` | `null` | no |
 | <a name="input_authentication_mode"></a> [authentication\_mode](#input\_authentication\_mode) | Authentication mode for the EKS cluster. | `string` | n/a | yes |
+| <a name="input_aws_access_key_id"></a> [aws\_access\_key\_id](#input\_aws\_access\_key\_id) | n/a | `string` | n/a | yes |
+| <a name="input_aws_secret_access_key"></a> [aws\_secret\_access\_key](#input\_aws\_secret\_access\_key) | n/a | `string` | n/a | yes |
+| <a name="input_aws_session_token"></a> [aws\_session\_token](#input\_aws\_session\_token) | n/a | `string` | `""` | no |
 | <a name="input_bootstrap_cluster_creator_admin_permissions"></a> [bootstrap\_cluster\_creator\_admin\_permissions](#input\_bootstrap\_cluster\_creator\_admin\_permissions) | Grant cluster creator admin permissions during bootstrap. | `bool` | n/a | yes |
 | <a name="input_cluster_kms_key_arn"></a> [cluster\_kms\_key\_arn](#input\_cluster\_kms\_key\_arn) | Existing KMS key ARN for EKS secrets encryption. Required when enable\_secrets\_encryption=true and create\_kms\_key=false. | `string` | `null` | no |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Name of the EKS cluster. | `string` | n/a | yes |
