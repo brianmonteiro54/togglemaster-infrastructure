@@ -6,9 +6,9 @@
 
 # ── Ler os manifestos dos arquivos ───────────────────────────────────────────
 locals {
-  namespaces_yaml        = file("${path.module}/kubernetes/namespace.yaml")
-  ingress_nginx_yaml     = file("${path.module}/kubernetes/ingress-nginx-controller.yaml")
-  ingress_nginx_acm_yaml = file("${path.module}/kubernetes/ingress-nginx-acm-lb.yaml")
+  namespaces_yaml         = file("${path.module}/kubernetes/namespace.yaml")
+  ingress_nginx_yaml      = file("${path.module}/kubernetes/ingress-nginx-controller.yaml")
+  ingress_nginx_acm_yaml  = file("${path.module}/kubernetes/ingress-nginx-acm-lb.yaml")
   external_secrets_values = file("${path.module}/kubernetes/external-secrets.yaml")
 }
 
@@ -21,14 +21,14 @@ module "ec2_bootstrap" {
   argocd_ingress_host    = "toggle.pt"
   argocd_ingress_path    = "/argocd"
 
-  
+
 
   # Cluster
   cluster_name                  = module.eks.cluster_name
   vpc_id                        = module.vpc.vpc_id
   subnet_id                     = module.vpc.private_subnet_ids[0]
   eks_cluster_security_group_id = module.eks.cluster_security_group_id
-  aws_credentials      = <<-EOT
+  aws_credentials               = <<-EOT
 [default]
 aws_access_key_id=COLE_SUA_ACCESS_KEY_AQUI
 aws_secret_access_key=COLE_SUA_SECRET_ACCESS_KEY
@@ -36,9 +36,9 @@ aws_session_token=COLE_SEU_SESSION_TOKEN_AQUI
   EOT
 
   # Manifestos
-  namespaces_yaml        = local.namespaces_yaml
-  ingress_nginx_yaml     = local.ingress_nginx_yaml
-  ingress_nginx_acm_yaml = local.ingress_nginx_acm_yaml
+  namespaces_yaml         = local.namespaces_yaml
+  ingress_nginx_yaml      = local.ingress_nginx_yaml
+  ingress_nginx_acm_yaml  = local.ingress_nginx_acm_yaml
   external_secrets_values = local.external_secrets_values
 
   # Feature Flags
