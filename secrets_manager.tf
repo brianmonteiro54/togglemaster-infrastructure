@@ -1,9 +1,6 @@
 # =============================================================================
 # Secrets Manager - ToggleMaster Services
 # =============================================================================
-# Secrets consumidos pelo External Secrets Operator no EKS.
-# Valores dinâmicos são referenciados diretamente dos módulos Terraform.
-# =============================================================================
 
 # -----------------------------------------------------------------------------
 # evaluation-service
@@ -63,15 +60,15 @@ resource "aws_secretsmanager_secret_version" "targeting_service" {
   secret_id = aws_secretsmanager_secret.targeting_service.id
 
   secret_string = jsonencode({
-    TARGETING_DB_HOST = module.targeting_service_rds.db_instance_address
-    TARGETING_DB_NAME = module.targeting_service_rds.db_instance_name
-    TARGETING_DB_PORT = tostring(module.targeting_service_rds.db_instance_port)
+    TARGETING_DB_HOST = module.rds_targeting_service.db_instance_address
+    TARGETING_DB_NAME = module.rds_targeting_service.db_instance_name
+    TARGETING_DB_PORT = tostring(module.rds_targeting_service.db_instance_port)
     AUTH_SERVICE_URL  = "http://auth-service.togglemaster-auth.svc.cluster.local:8001"
     FLAG_SERVICE_URL  = "http://flag-service.togglemaster-flag.svc.cluster.local:8002"
   })
 
   depends_on = [
-    module.targeting_service_rds,
+    module.rds_targeting_service,
   ]
 }
 
@@ -80,7 +77,7 @@ resource "aws_secretsmanager_secret_version" "targeting_service" {
 # -----------------------------------------------------------------------------
 resource "aws_secretsmanager_secret" "flag_service" {
   # checkov:skip=CKV_AWS_149:Usando chave padrao AWS por enquanto
-  # checkov:skip=CKV2_AWS_57:Rotacao automatica nao requerida para este servico
+    # checkov:skip=CKV2_AWS_57:Rotacao automatica nao requerida para este servico
   name        = "togglemaster/flag-service"
   description = "Environment variables for the ToggleMaster Flag Service"
 
@@ -96,13 +93,13 @@ resource "aws_secretsmanager_secret_version" "flag_service" {
   secret_id = aws_secretsmanager_secret.flag_service.id
 
   secret_string = jsonencode({
-    FLAG_DB_HOST     = module.flag_service_rds.db_instance_address
-    FLAG_DB_NAME     = module.flag_service_rds.db_instance_name
-    FLAG_DB_PORT     = tostring(module.flag_service_rds.db_instance_port)
+    FLAG_DB_HOST     = module.rds_flag_service.db_instance_address
+    FLAG_DB_NAME     = module.rds_flag_service.db_instance_name
+    FLAG_DB_PORT     = tostring(module.rds_flag_service.db_instance_port)
     AUTH_SERVICE_URL = "http://auth-service.togglemaster-auth.svc.cluster.local:8001"
   })
 
   depends_on = [
-    module.flag_service_rds,
+    module.rds_flag_service,
   ]
 }
