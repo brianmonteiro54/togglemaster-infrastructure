@@ -77,7 +77,7 @@ resource "aws_secretsmanager_secret_version" "targeting_service" {
 # -----------------------------------------------------------------------------
 resource "aws_secretsmanager_secret" "flag_service" {
   # checkov:skip=CKV_AWS_149:Usando chave padrao AWS por enquanto
-    # checkov:skip=CKV2_AWS_57:Rotacao automatica nao requerida para este servico
+  # checkov:skip=CKV2_AWS_57:Rotacao automatica nao requerida para este servico
   name        = "togglemaster/flag-service"
   description = "Environment variables for the ToggleMaster Flag Service"
 
