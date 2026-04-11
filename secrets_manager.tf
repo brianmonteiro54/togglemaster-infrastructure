@@ -103,3 +103,35 @@ resource "aws_secretsmanager_secret_version" "flag_service" {
     module.rds_flag_service,
   ]
 }
+
+# -----------------------------------------------------------------------------
+# auth-service
+# -----------------------------------------------------------------------------
+resource "aws_secretsmanager_secret" "auth_service" {
+  # checkov:skip=CKV_AWS_149:Usando chave padrao AWS por enquanto
+  # checkov:skip=CKV2_AWS_57:Rotacao automatica nao requerida para este servico
+  name        = "togglemaster/auth-service"
+  description = "Environment variables for the ToggleMaster Auth Service"
+
+  tags = {
+    Project     = var.cluster_name
+    Service     = "auth-service"
+    Ambiente    = var.tag_ambiente
+    Environment = var.tag_environment
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "auth_service" {
+  secret_id = aws_secretsmanager_secret.auth_service.id
+
+  secret_string = jsonencode({
+    AUTH_DB_HOST = module.rds_auth_service.db_instance_address
+    AUTH_DB_NAME = module.rds_auth_service.db_instance_name
+    AUTH_DB_PORT = "5432"
+    MASTER_KEY   = "change-me"
+  })
+
+  depends_on = [
+    module.rds_auth_service,
+  ]
+}
