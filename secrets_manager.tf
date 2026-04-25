@@ -135,3 +135,32 @@ resource "aws_secretsmanager_secret_version" "auth_service" {
     module.rds_auth_service,
   ]
 }
+
+# -----------------------------------------------------------------------------
+# monitoring
+# -----------------------------------------------------------------------------
+resource "aws_secretsmanager_secret" "monitoring" {
+  # checkov:skip=CKV_AWS_149:Usando chave padrao AWS por enquanto
+  # checkov:skip=CKV2_AWS_57:Rotacao automatica nao requerida para este servico
+  name        = "togglemaster/monitoring"
+  description = "Environment variables for the ToggleMaster Monitoring"
+
+  tags = {
+    Project     = var.cluster_name
+    Service     = "monitoring"
+    Ambiente    = var.tag_ambiente
+    Environment = var.tag_environment
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "monitoring" {
+  secret_id = aws_secretsmanager_secret.monitoring.id
+
+  secret_string = jsonencode({
+    DISCORD_WEBHOOK_URL      = ""
+    PAGERDUTY_SERVICE_KEY    = ""
+    GRAFANA_ADMIN_USER       = ""
+    GRAFANA_ADMIN_PASSWORD   = ""
+    NEW_RELIC_API_KEY        = ""
+  })
+}
