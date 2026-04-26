@@ -157,10 +157,10 @@ resource "aws_secretsmanager_secret_version" "monitoring" {
   secret_id = aws_secretsmanager_secret.monitoring.id
 
   secret_string = jsonencode({
-    DISCORD_WEBHOOK_URL      = ""
-    PAGERDUTY_SERVICE_KEY    = ""
-    GRAFANA_ADMIN_USER       = ""
-    GRAFANA_ADMIN_PASSWORD   = ""
-    NEW_RELIC_API_KEY        = ""
+    DISCORD_WEBHOOK_URL    = ""
+    PAGERDUTY_SERVICE_KEY  = ""
+    GRAFANA_ADMIN_USER     = ""
+    GRAFANA_ADMIN_PASSWORD = ""
+    NEW_RELIC_API_KEY      = ""
   })
 }
