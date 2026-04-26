@@ -309,7 +309,7 @@ A seção abaixo é **automaticamente populada** pelo [terraform-docs](https://t
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_dynamodb_analytics"></a> [dynamodb\_analytics](#module\_dynamodb\_analytics) | github.com/brianmonteiro54/terraform-aws-dynamodb//modules/dynamodb | 8a55060136580d55f3953de4116ce485ca9e1b11 |
-| <a name="module_ec2_bootstrap"></a> [ec2\_bootstrap](#module\_ec2\_bootstrap) | github.com/brianmonteiro54/terraform-aws-eks-bootstrap//modules/bootstrap | 7e2ddeb6630a62b39808554218a10cd80dcaeb46 |
+| <a name="module_ec2_bootstrap"></a> [ec2\_bootstrap](#module\_ec2\_bootstrap) | github.com/brianmonteiro54/terraform-aws-eks-bootstrap//modules/bootstrap | 6025316263570e7f9dd5b09439615c4848984a49 |
 | <a name="module_ecr_analytics_service"></a> [ecr\_analytics\_service](#module\_ecr\_analytics\_service) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | 2c4973a14fc5d908e6d9c534d46a453a18d29206 |
 | <a name="module_ecr_auth_service"></a> [ecr\_auth\_service](#module\_ecr\_auth\_service) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | 2c4973a14fc5d908e6d9c534d46a453a18d29206 |
 | <a name="module_ecr_evaluation_service"></a> [ecr\_evaluation\_service](#module\_ecr\_evaluation\_service) | github.com/brianmonteiro54/terraform-aws-ecr//modules/ecr | 2c4973a14fc5d908e6d9c534d46a453a18d29206 |
@@ -328,6 +328,16 @@ A seção abaixo é **automaticamente populada** pelo [terraform-docs](https://t
 
 | Name | Type |
 |------|------|
+| [aws_secretsmanager_secret.auth_service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret.evaluation_service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret.flag_service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret.monitoring](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret.targeting_service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret_version.auth_service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
+| [aws_secretsmanager_secret_version.evaluation_service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
+| [aws_secretsmanager_secret_version.flag_service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
+| [aws_secretsmanager_secret_version.monitoring](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
+| [aws_secretsmanager_secret_version.targeting_service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [aws_security_group.eks_workers](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_vpc_security_group_egress_rule.eks_workers_egress_all](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_egress_rule) | resource |
 | [aws_vpc_security_group_ingress_rule.eks_workers_from_pritunl](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_security_group_ingress_rule) | resource |
